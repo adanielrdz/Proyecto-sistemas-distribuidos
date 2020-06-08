@@ -28,8 +28,11 @@ public class Cliente extends JFrame implements ActionListener
 	Socket s=null;
 	//OBJETOS DE JFRAME
 	
-	public static void main(String[]args)
+	public static void main(String[]args) throws SigarException, IOException
 	{
+		Cliente c=new Cliente();
+		c.obtenerDatos();
+		c.enviarDatos();
 		
 	}
 	//INTERFAZ DEL CLIENTE 
@@ -42,8 +45,8 @@ public class Cliente extends JFrame implements ActionListener
 	protected Datos obtenerDatos() throws SigarException, UnknownHostException
 	{
 		//OBETNER HOSTNAME 
-		InetAddress addr = InetAddress.getByName("25.0.122.89");
-		String usuario = addr.getHostName();
+	//	InetAddress addr = InetAddress.getByName("25.0.122.89");
+		String usuario ="";
 		//INSTANCIAS DE OBJETOS DE LA LIBRERIA SIGAR
 		Sigar sigar=new Sigar();
 		Mem mem=sigar.getMem();
@@ -73,7 +76,7 @@ public class Cliente extends JFrame implements ActionListener
 		System.out.println("Se entró a: enviar datos");
 		try{
 			//INSTANCIO EL SOCKET CON LA IP Y PUERTO
-			s=new Socket("127.0.0.1",4765);
+			s=new Socket("localhost",4090);
 			System.out.println("socket cargado");
 			oos = new ObjectOutputStream(s.getOutputStream());
 			////ENVIO DE DATOS AL SERVIDOR
@@ -100,6 +103,8 @@ public class Cliente extends JFrame implements ActionListener
 	//METODO QUE EJECUTA LA CONEXION 
 	protected void ejecutarConexion()
 	{
+		
+		
 		
 	}
 	
