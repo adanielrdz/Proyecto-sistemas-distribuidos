@@ -92,6 +92,14 @@ public class Datos implements Serializable
 	public void setRamLibre(String ramLibre) {
 		this.ramLibre = ramLibre;
 	}
+
+	public String getDiscoLibre() {
+		return discoLibre;
+	}
+
+	public void setDiscoLibre(String discoLibre) {
+		this.discoLibre = discoLibre;
+	}
 	
 	
 	
