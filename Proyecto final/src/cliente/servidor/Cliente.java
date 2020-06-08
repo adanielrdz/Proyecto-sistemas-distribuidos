@@ -76,7 +76,7 @@ public class Cliente extends JFrame implements ActionListener
 		System.out.println("Se entró a: enviar datos");
 		try{
 			//INSTANCIO EL SOCKET CON LA IP Y PUERTO
-			s=new Socket("localhost",4090);
+			s=new Socket("localhost",4560);
 			System.out.println("socket cargado");
 			oos = new ObjectOutputStream(s.getOutputStream());
 			////ENVIO DE DATOS AL SERVIDOR

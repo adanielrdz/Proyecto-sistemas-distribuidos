@@ -12,16 +12,15 @@ import javax.swing.JFrame;
 
 public class Servidor extends JFrame implements ActionListener
 {
-	private static int port=4090;
-	private ObjectInputStream ois;
-	private ObjectOutputStream oos;
+	private int port=4560;
+	private ObjectInputStream ois=null;
+	private ObjectOutputStream oos=null;
 	private Socket s=null;
 	private ServerSocket ss;
 
 	public static void main(String[]args)
 	{
 		Servidor server=new Servidor();
-		server.levantarConexion(port);
 		server.ejecutarConexion();
 		
 	}
@@ -33,57 +32,44 @@ public class Servidor extends JFrame implements ActionListener
 	}
 	
 	//METODO PARA LEVANTAR LA CONEXION ENTRE EL CLIENTE Y SERVIDOR 
-	protected void levantarConexion(int port)
-	{
-		try 
-		{
-        	ss = new ServerSocket(port);
-        	System.out.println("Esperando conexion del puerto: "+port);
-        	s = ss.accept();
-        //	System.out.println("Conexión establecida con: " + s.getInetAddress().getHostName() + "\n\n\n");
-		} catch (Exception e) 
-		{
-        	System.out.println("Error en levantarConexion(): " + e.getMessage());
-        	System.exit(0);
-		}
-		
-	}
-	//METODO PARA RECIBIR LOS DATOS
-	protected void recibirDatos() throws IOException, ClassNotFoundException
-	{
-		ois = new ObjectInputStream(s.getInputStream());
-		oos = new ObjectOutputStream(s.getOutputStream());
-		Datos data = (Datos)ois.readObject();
-		System.out.println("Leyendo el sistema operativo.....");
-		System.out.println(data.getSo());
-	}
 	
 	protected void ejecutarConexion()
 	{
+		ois = null;
+		oos = null;
+		s = null;
+			
 		Thread hilo = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
-                    try {
-                        levantarConexion(port);
-                        try {
-							recibirDatos();
-						} catch (ClassNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							System.out.println("No se encontro la clase");
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+                while (true) 
+                {
+                    try 
+                    {
+                    	ss = new ServerSocket(port);
+                    	System.out.println("Esperando conexión entrante en el puerto " + String.valueOf(port) + "...");
+                    	s = ss.accept();
+                    	System.out.println("Conexión establecida con: " + s.getInetAddress().getHostName() + "\n\n\n");
+                    	ois = new ObjectInputStream(s.getInputStream());
+                	    Datos data = (Datos)ois.readObject();
+                		System.out.println("Leyendo el sistema operativo.....");
+                		System.out.println(data.getSo());
                         
-                    } finally {
+                    } catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} finally {
                         cerrarConexion();
                     }
                 }
             }
         });
+		
         hilo.start();
+		
 	}
 	
 	//METODO PARA EL ALGORITMO DE RANKEO
@@ -102,7 +88,7 @@ public class Servidor extends JFrame implements ActionListener
             s.close();
         } catch (IOException e) {
         } finally {
-            System.out.println("Conversación finalizada....");
+            System.out.println("Conexion cerrada....");
             System.exit(0);
 
         }
