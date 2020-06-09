@@ -39,8 +39,9 @@ public class Cliente extends JFrame implements ActionListener
 	//OBJETOS DE JFRAME
 
 	//OBJETOS DE JFRANE
-	private JLabel txtPuerto, txtIPusuario, txtIPdestino;
+	private JLabel txtPuerto, txtIPusuario;
 	private JPanel contentPane;
+	private JTextField txtIPdestino;
 	private JTextField txtRAM;
 	private JTextField txtProcesador;
 	private JTextField txtSO;
@@ -56,7 +57,6 @@ public class Cliente extends JFrame implements ActionListener
 	{
 		Cliente c=new Cliente();
 		c.interfazCliente();
-		
 	}
 	
 	//INTERFAZ DEL CLIENTE 
@@ -200,7 +200,7 @@ public class Cliente extends JFrame implements ActionListener
 		jlPuerto.setBounds(24, 33, 46, 14);
 		panel_1.add(jlPuerto);
 		
-		txtIPdestino = new JLabel("255.255.255.255");
+		txtIPdestino = new JTextField();
 		txtIPdestino.setBounds(94, 11, 106, 14);
 		panel_1.add(txtIPdestino);
 		
@@ -218,7 +218,7 @@ public class Cliente extends JFrame implements ActionListener
 		btnEmpezar.addActionListener(this);
 		panel_2.add(btnEmpezar);
 		
-		txtIPusuario = new JLabel("255.255.255.255");
+		txtIPusuario = new JLabel("localhost");
 		txtIPusuario.setBounds(352, 14, 103, 14);
 		panel_2.add(txtIPusuario);
 		
@@ -229,9 +229,7 @@ public class Cliente extends JFrame implements ActionListener
 	//METODO QUE OBTIENE LOS DATOS
 	protected Datos obtenerDatos() throws SigarException, UnknownHostException
 	{
-		//OBETNER HOSTNAME 
-			InetAddress addr = InetAddress.getByName("25.0.122.89");
-			String usuario ="Daniel";
+			String usuario ="";//AQUI PONGAN SU NOMBRE 
 			//INSTANCIAS DE OBJETOS DE LA LIBRERIA SIGAR
 			Sigar sigar=new Sigar();
 			Mem mem=sigar.getMem();
@@ -251,6 +249,7 @@ public class Cliente extends JFrame implements ActionListener
 			double division = (((mem.getRam()-(mem.getActualUsed()/(1024*1024)))/1000)*100)/Double.parseDouble(ram);
 			String ramLibre= division + "";
 			String discoLibre=(((drive.getFreeSpace()/1073741824)*100)/discoTotal) + "";
+		//	String puntos=String.valueOf(algoritmoRankeo(datos));
 			//AGREGAMOS LOS DATOS AL CONSTRUCTOR
 			datos = new Datos(usuario, modeloProcesador,velocidadProcesador,so,ram,disco,cpuLibre,ramLibre,discoLibre);
 			return datos;
@@ -295,109 +294,7 @@ public class Cliente extends JFrame implements ActionListener
 		direcciones.add(daniel);
 		return direcciones;
 	}
-	
-	//ALGORITMO DE RANKEO
-		protected int algoritmoRankeo(Datos dato)
-		{
-			int pts=0;
-			// serie de cpu intel y AMD (mejorable)
-			if(dato.getModeloProcesador().contains("i7")) {
-				pts+=1000;
-			} else if(dato.getModeloProcesador().contains("i5")) {
-				pts+=800;
-			} else if(dato.getModeloProcesador().contains("i3")) {
-				pts+=600;
-			} else if(dato.getModeloProcesador().contains("Pentium")) {
-				pts+=400;
-			} else if(dato.getModeloProcesador().contains("Celeron")) {
-				pts+=200;
-			} else if(dato.getModeloProcesador().contains("A8")) {
-				pts+=300;
-			}
-			
-			// velocidad de cpu
-			int cpufreq = Integer.parseInt(dato.getVelocidadProcesador());
-			if(cpufreq >= 3200) {
-				pts+=1100;
-			}else if(cpufreq < 3200 && cpufreq >= 2400) {
-				pts+=900;
-			} else if(cpufreq < 2400 && cpufreq >= 1900) {
-				pts+=700;
-			} else if(cpufreq < 1900 && cpufreq >= 1400) {
-				pts=500;
-			}else {
-				pts+=200;
-			}
-			
-			// RAM total
-			int mem = Integer.parseInt(dato.getRam());
-			// 12 GB o mas
-			if(mem >= 12288) {
-				pts+=700;
-			}
-			// Entre 8GB y 12 GB (menor a 12GB)
-			else if(mem < 12288 && mem >= 8192) {
-				pts+=500;
-			} 
-			// Entre 4GB y 8GB (menor a 8GB)
-			else if(mem < 8192 && mem >= 4096) {
-				pts+=250;
-			}
-			else {
-				pts+=100;
-			}
-			
-			//CPU libre %
-			double cpuLibre =Double.parseDouble(dato.getCpuLibre());
-			if(cpuLibre >= 90) {
-				pts+=1500;
-			} else if(cpuLibre < 90 && cpuLibre >= 80) {
-				pts+=1350;
-			} else if(cpuLibre < 80 && cpuLibre >= 70) {
-				pts+=1050;
-			} else if(cpuLibre < 70 && cpuLibre >= 60) {
-				pts+=700;
-			} else if(cpuLibre < 60 && cpuLibre >= 50) {
-				pts+=550;
-			} else {
-				pts+=300;
-			}
-			
-			// RAM libre %
-			double ramLibre =Double.parseDouble(dato.getRamLibre());
-			if(ramLibre >= 90) {
-				pts+=1400;
-			} else if(ramLibre < 90 && ramLibre >= 80) {
-				pts+=1250;
-			} else if(ramLibre < 80 && ramLibre >= 70) {
-				pts+=950;
-			} else if(ramLibre < 70 && ramLibre >= 60) {
-				pts+=700;
-			} else if(ramLibre < 60 && ramLibre >= 50) {
-				pts+=550;
-			} else {
-				pts+=300;
-			}
-			
-			// disco libre %
-			double discoLibre = Double.parseDouble(dato.getDiscoLibre());
-			if(discoLibre >= 90) {
-				pts+=1400;
-			} else if(discoLibre < 90 && discoLibre >= 80) {
-				pts+=1250;
-			} else if(discoLibre < 80 && discoLibre >= 70) {
-				pts+=950;
-			} else if(discoLibre < 70 && discoLibre >= 60) {
-				pts+=700;
-			} else if(discoLibre < 60 && discoLibre >= 50) {
-				pts+=550;
-			} else {
-				pts+=300;
-			}
-			
-			return pts;
-		}
-	
+		
 	//METODO PARA LAS ACCIONES DE LOS BOTONES
 	@Override
 	public void actionPerformed(ActionEvent e) 
@@ -405,7 +302,7 @@ public class Cliente extends JFrame implements ActionListener
 		if(e.getSource()==btnEmpezar)
 		{
 			try {
-				enviarDatos(txtIPusuario.getText(),Integer.parseInt(txtPuerto.getText()));
+				enviarDatos(txtIPdestino.getText(),Integer.parseInt(txtPuerto.getText()));
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

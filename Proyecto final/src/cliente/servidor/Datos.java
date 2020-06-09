@@ -14,7 +14,8 @@ public class Datos implements Serializable
 	private String cpuLibre;
 	private String ramLibre;
 	private String discoLibre;
-	
+	//PUNTOS 
+	private String puntos;
 	public Datos(String usuario, String modeloProcesador, String velocidadProcesador, String so, String ram,
 			String disco, String cpuLibre, String ramLibre, String discoLibre) {
 		super();
@@ -103,12 +104,10 @@ public class Datos implements Serializable
 
 	@Override
 	public String toString() {
-		return "Datos [usuario=" + usuario + "\n"+", modeloProcesador=" + modeloProcesador + "\n"+", velocidadProcesador="
+		return "Datos [usuario=" + usuario + ", modeloProcesador=" + modeloProcesador + ", velocidadProcesador="
 				+ velocidadProcesador + ", so=" + so + ", ram=" + ram + ", disco=" + disco + ", cpuLibre=" + cpuLibre
-				+ ", ramLibre=" + ramLibre + ", discoLibre=" + discoLibre + "]";
+				+ ", ramLibre=" + ramLibre + ", discoLibre=" + discoLibre + ", puntos=" + puntos + "]";
 	}
-	
-	
 	
 	
 }

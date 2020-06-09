@@ -27,7 +27,6 @@ public class Servidor extends JFrame implements ActionListener
 	private ObjectOutputStream oos=null;
 	private Socket s=null;
 	private ServerSocket ss;
-	
 	//OBJETOS DEL JFRAME 
 	private JPanel contentPane;
 	private JTable tablaClientes;
@@ -138,6 +137,7 @@ public class Servidor extends JFrame implements ActionListener
                     ois = new ObjectInputStream(s.getInputStream());
                 	Datos data = (Datos)ois.readObject();
                 	cargarDatos(data);    
+                	
                     } catch (ClassNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -156,8 +156,103 @@ public class Servidor extends JFrame implements ActionListener
 	//METODO PARA EL ALGORITMO DE RANKEO
 	protected int algoritmoRankeo(Datos datos)
 	{
-		int rank=0;
-		return rank; 
+		int pts=0;
+		// serie de cpu intel y AMD (mejorable)
+		if(datos.getModeloProcesador().contains("i7")) {
+			pts+=1000;
+		} else if(datos.getModeloProcesador().contains("i5")) {
+			pts+=800;
+		} else if(datos.getModeloProcesador().contains("i3")) {
+			pts+=600;
+		} else if(datos.getModeloProcesador().contains("Pentium")) {
+			pts+=400;
+		} else if(datos.getModeloProcesador().contains("Celeron")) {
+			pts+=200;
+		} else if(datos.getModeloProcesador().contains("A8")) {
+			pts+=300;
+		}
+		
+		// velocidad de cpu
+		int cpufreq = Integer.parseInt(datos.getVelocidadProcesador());
+		if(cpufreq >= 3200) {
+			pts+=1100;
+		}else if(cpufreq < 3200 && cpufreq >= 2400) {
+			pts+=900;
+		} else if(cpufreq < 2400 && cpufreq >= 1900) {
+			pts+=700;
+		} else if(cpufreq < 1900 && cpufreq >= 1400) {
+			pts=500;
+		}else {
+			pts+=200;
+		}
+		
+		// RAM total
+		int mem = Integer.parseInt(datos.getRam());
+		// 12 GB o mas
+		if(mem >= 12288) {
+			pts+=700;
+		}
+		// Entre 8GB y 12 GB (menor a 12GB)
+		else if(mem < 12288 && mem >= 8192) {
+			pts+=500;
+		} 
+		// Entre 4GB y 8GB (menor a 8GB)
+		else if(mem < 8192 && mem >= 4096) {
+			pts+=250;
+		}
+		else {
+			pts+=100;
+		}
+		
+		//CPU libre %
+		double cpuLibre =Double.parseDouble(datos.getCpuLibre());
+		if(cpuLibre >= 90) {
+			pts+=1500;
+		} else if(cpuLibre < 90 && cpuLibre >= 80) {
+			pts+=1350;
+		} else if(cpuLibre < 80 && cpuLibre >= 70) {
+			pts+=1050;
+		} else if(cpuLibre < 70 && cpuLibre >= 60) {
+			pts+=700;
+		} else if(cpuLibre < 60 && cpuLibre >= 50) {
+			pts+=550;
+		} else {
+			pts+=300;
+		}
+		
+		// RAM libre %
+		double ramLibre =Double.parseDouble(datos.getRamLibre());
+		if(ramLibre >= 90) {
+			pts+=1400;
+		} else if(ramLibre < 90 && ramLibre >= 80) {
+			pts+=1250;
+		} else if(ramLibre < 80 && ramLibre >= 70) {
+			pts+=950;
+		} else if(ramLibre < 70 && ramLibre >= 60) {
+			pts+=700;
+		} else if(ramLibre < 60 && ramLibre >= 50) {
+			pts+=550;
+		} else {
+			pts+=300;
+		}
+		
+		// disco libre %
+		double discoLibre = Double.parseDouble(datos.getDiscoLibre());
+		if(discoLibre >= 90) {
+			pts+=1400;
+		} else if(discoLibre < 90 && discoLibre >= 80) {
+			pts+=1250;
+		} else if(discoLibre < 80 && discoLibre >= 70) {
+			pts+=950;
+		} else if(discoLibre < 70 && discoLibre >= 60) {
+			pts+=700;
+		} else if(discoLibre < 60 && discoLibre >= 50) {
+			pts+=550;
+		} else {
+			pts+=300;
+		}
+		
+		return pts; 
 	}
 	
 	//METODO PARA CARGAR EL MODELO DE LA TABLA Y QUE SEA DINAMICA
@@ -179,6 +274,12 @@ public class Servidor extends JFrame implements ActionListener
 		String[] dataCliente= {nomCliente};
 		modeloClientes.addRow(dataCliente);
 		
+		/*
+		//TABLA Y MODEO DE RANKEO
+		String puntos=String.valueOf(algoritmoRankeo(datos));
+		String[] dataRank= {puntos};
+		modeloRank.addRow(dataRank);
+		*/
 	}
 	
 	protected void encabezadoTablas()
@@ -225,11 +326,8 @@ public class Servidor extends JFrame implements ActionListener
 		if(e.getSource()==btnEjecutar)
 		{
 			
-		        	//ejecutarConexion(Integer.parseInt(txtPort.getText()));
-		        	ejecutarConexion(4560);
-		      
-		       
-		  
+			ejecutarConexion(Integer.parseInt(txtPort.getText()));
+		    
 		    System.out.println("Fue con exito");
 		}
 	}
