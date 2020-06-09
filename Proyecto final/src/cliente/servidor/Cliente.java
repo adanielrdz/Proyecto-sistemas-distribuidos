@@ -1,5 +1,6 @@
 package cliente.servidor;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -17,6 +18,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.LineBorder;
 
 import org.hyperic.sigar.CpuInfo;
 import org.hyperic.sigar.CpuPerc;
@@ -37,72 +40,190 @@ public class Cliente extends JFrame implements ActionListener
 	//OBJETOS DE JFRAME
 
 	//OBJETOS DE JFRANE
+	private JLabel txtPuerto, txtIPusuario, txtIPdestino;
 	private JPanel contentPane;
-	private JTextField txtIP;
-	private JTextField txtPuerto;
-	private JButton btnConectar;
-	private JButton btnEnviar;
-	private JButton btnObtener;
-	private JLabel lblDatos;
-	private JLabel lblPuerto;
-	private JLabel lblIp;
+	private JTextField txtRAM;
+	private JTextField txtProcesador;
+	private JTextField txtSO;
+	private JTextField txtDD;
+	private JTextField txtDDlibre;
+	private JTextField txtRAMlibre;
+	private JTextField txtCPUlibre;
+	private JTextField txtVelProcesador;
+	private JTextField txtUsuario;
+	private JButton btnCargar, btnEmpezar, btnParar;
+	
 	public static void main(String[]args) throws SigarException, IOException
 	{
 		Cliente c=new Cliente();
 		c.interfazCliente();
 		
 	}
+	
 	//INTERFAZ DEL CLIENTE 
 	protected void interfazCliente()
 	{
+		setTitle("SDP: Cliente");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 592, 347);
-		setTitle("Cliente");
-		setVisible(true);
+		setBounds(100, 100, 512, 332);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		//INSTANCIAR OBJETOS DE JLABEL
-		lblIp = new JLabel("IP del servidor");
-		lblIp.setBounds(15, 37, 115, 20);
-		contentPane.add(lblIp);
+		JPanel panel_2 = new JPanel();
+		panel_2.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		panel_2.setBounds(10, 11, 476, 277);
+		contentPane.add(panel_2);
+		panel_2.setLayout(null);
 		
-		lblPuerto = new JLabel("Puerto");
-		lblPuerto.setBounds(318, 37, 69, 20);
-		contentPane.add(lblPuerto);
+		JPanel panelDatosEstaticos = new JPanel();
+		panelDatosEstaticos.setBounds(5, 35, 466, 130);
+		panel_2.add(panelDatosEstaticos);
+		panelDatosEstaticos.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panelDatosEstaticos.setLayout(null);
 		
-		lblDatos = new JLabel("Informacion del sistema");
-		lblDatos.setBounds(15, 86, 533, 100);
-		contentPane.add(lblDatos);
-
-		//INSTANCIAR OBJETOS DE JTEXTFIELD
-		txtIP = new JTextField();
-		txtIP.setBounds(145, 34, 146, 26);
-		contentPane.add(txtIP);
-		txtIP.setColumns(10);
-
-		txtPuerto = new JTextField();
-		txtPuerto.setBounds(402, 34, 146, 26);
-		contentPane.add(txtPuerto);
-		txtPuerto.setColumns(10);
+		JLabel jlRAM = new JLabel("RAM:");
+		jlRAM.setBounds(10, 42, 90, 14);
+		panelDatosEstaticos.add(jlRAM);
 		
-		//INSTANCIAR OBJETOS JBUTTON 
-		btnConectar = new JButton("Conectar");
-		btnConectar.setBounds(26, 246, 115, 29);
-		btnConectar.addActionListener(this);
-		contentPane.add(btnConectar);
+		JLabel jlProcesador = new JLabel("Procesador:");
+		jlProcesador.setBounds(10, 73, 90, 14);
+		panelDatosEstaticos.add(jlProcesador);
 		
-		btnEnviar = new JButton("Enviar");
-		btnEnviar.setBounds(414, 246, 115, 29);
-		btnEnviar.addActionListener(this);
-		contentPane.add(btnEnviar);
-
-		btnObtener = new JButton("Obtener Informacion");
-		btnObtener.setBounds(187, 203, 196, 29);
-		btnObtener.addActionListener(this);
-		contentPane.add(btnObtener);
+		JLabel jlSO = new JLabel("Sistema operativo:");
+		jlSO.setBounds(10, 11, 110, 14);
+		panelDatosEstaticos.add(jlSO);
+		
+		JLabel jlDD = new JLabel("Disco duro:");
+		jlDD.setBounds(10, 104, 90, 14);
+		panelDatosEstaticos.add(jlDD);
+		
+		txtRAM = new JTextField();
+		txtRAM.setEditable(false);
+		txtRAM.setBounds(127, 39, 86, 20);
+		panelDatosEstaticos.add(txtRAM);
+		txtRAM.setColumns(10);
+		
+		txtProcesador = new JTextField();
+		txtProcesador.setEditable(false);
+		txtProcesador.setBounds(127, 70, 120, 20);
+		panelDatosEstaticos.add(txtProcesador);
+		txtProcesador.setColumns(10);
+		
+		txtSO = new JTextField();
+		txtSO.setEditable(false);
+		txtSO.setBounds(127, 8, 120, 20);
+		panelDatosEstaticos.add(txtSO);
+		txtSO.setColumns(10);
+		
+		txtDD = new JTextField();
+		txtDD.setEditable(false);
+		txtDD.setBounds(127, 101, 86, 20);
+		panelDatosEstaticos.add(txtDD);
+		txtDD.setColumns(10);
+		
+		txtVelProcesador = new JTextField();
+		txtVelProcesador.setEditable(false);
+		txtVelProcesador.setBounds(390, 70, 66, 20);
+		panelDatosEstaticos.add(txtVelProcesador);
+		txtVelProcesador.setColumns(10);
+		
+		JLabel jlVelProcesador = new JLabel("Velocidad procesador:");
+		jlVelProcesador.setBounds(250, 73, 130, 14);
+		panelDatosEstaticos.add(jlVelProcesador);
+		
+		btnCargar = new JButton("Cargar datos");
+		btnCargar.setBounds(287, 97, 110, 23);
+		btnCargar.addActionListener(this);
+		panelDatosEstaticos.add(btnCargar);
+		
+		txtUsuario = new JTextField();
+		txtUsuario.setBounds(64, 11, 150, 20);
+		panel_2.add(txtUsuario);
+		txtUsuario.setColumns(10);
+		
+		JLabel jlNombreUsuario = new JLabel("Usuario:");
+		jlNombreUsuario.setBounds(10, 14, 60, 14);
+		panel_2.add(jlNombreUsuario);
+		
+		JLabel jlIPusuario = new JLabel("IP usuario:");
+		jlIPusuario.setBounds(284, 14, 60, 14);
+		panel_2.add(jlIPusuario);
+		
+		JPanel panelDatosDinamicos = new JPanel();
+		panelDatosDinamicos.setBounds(5, 167, 246, 105);
+		panel_2.add(panelDatosDinamicos);
+		panelDatosDinamicos.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panelDatosDinamicos.setLayout(null);
+		
+		JLabel jlRAMlibre = new JLabel("RAM libre:");
+		jlRAMlibre.setBounds(10, 45, 80, 14);
+		panelDatosDinamicos.add(jlRAMlibre);
+		
+		JLabel jlCPUlibre = new JLabel("CPU libre:");
+		jlCPUlibre.setBounds(10, 14, 80, 14);
+		panelDatosDinamicos.add(jlCPUlibre);
+		
+		JLabel jlDDlibre = new JLabel("Disco duro libre:");
+		jlDDlibre.setBounds(10, 76, 92, 14);
+		panelDatosDinamicos.add(jlDDlibre);
+		
+		txtDDlibre = new JTextField();
+		txtDDlibre.setEditable(false);
+		txtDDlibre.setBounds(112, 73, 124, 20);
+		panelDatosDinamicos.add(txtDDlibre);
+		txtDDlibre.setColumns(10);
+		
+		txtRAMlibre = new JTextField();
+		txtRAMlibre.setEditable(false);
+		txtRAMlibre.setBounds(112, 42, 86, 20);
+		panelDatosDinamicos.add(txtRAMlibre);
+		txtRAMlibre.setColumns(10);
+		
+		txtCPUlibre = new JTextField();
+		txtCPUlibre.setEditable(false);
+		txtCPUlibre.setBounds(112, 11, 124, 20);
+		panelDatosDinamicos.add(txtCPUlibre);
+		txtCPUlibre.setColumns(10);
+		
+		JPanel panel_1 = new JPanel();
+		panel_1.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panel_1.setBounds(261, 176, 210, 58);
+		panel_2.add(panel_1);
+		panel_1.setLayout(null);
+		
+		JLabel jlIPdestino = new JLabel("IP destino:");
+		jlIPdestino.setBounds(24, 11, 60, 14);
+		panel_1.add(jlIPdestino);
+		
+		JLabel jlPuerto = new JLabel("Puerto:");
+		jlPuerto.setBounds(24, 33, 46, 14);
+		panel_1.add(jlPuerto);
+		
+		txtIPdestino = new JLabel("255.255.255.255");
+		txtIPdestino.setBounds(94, 11, 106, 14);
+		panel_1.add(txtIPdestino);
+		
+		txtPuerto = new JLabel("4560");
+		txtPuerto.setBounds(94, 33, 46, 14);
+		panel_1.add(txtPuerto);
+		
+		btnParar = new JButton("Parar");
+		btnParar.setBounds(271, 243, 89, 23);
+		btnParar.addActionListener(this);
+		panel_2.add(btnParar);
+		
+		btnEmpezar = new JButton("Empezar");
+		btnEmpezar.setBounds(370, 243, 89, 23);
+		btnEmpezar.addActionListener(this);
+		panel_2.add(btnEmpezar);
+		
+		txtIPusuario = new JLabel("255.255.255.255");
+		txtIPusuario.setBounds(352, 14, 103, 14);
+		panel_2.add(txtIPusuario);
+		
+		setVisible(true);
 		
 	}
 	
@@ -283,35 +404,58 @@ public class Cliente extends JFrame implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e) 
 	{
-		if(e.getSource()==btnEnviar)
+		if(e.getSource()==btnEmpezar)
 		{
 			try {
-				enviarDatos(txtIP.getText(),Integer.parseInt(txtPuerto.getText()));
+				enviarDatos(txtIPusuario.getText(),Integer.parseInt(txtPuerto.getText()));
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				System.out.println("IOException: " + e1.getMessage());
 			} catch (NumberFormatException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				System.out.println("NumberFormatException: " + e1.getMessage());
 			} catch (SigarException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				System.out.println("SigarException: " + e1.getMessage());
 			}
 			
 		}
-		if(e.getSource()==btnObtener)
+		if(e.getSource()==btnCargar)
 		{
 			try {
 				obtenerDatos();
 			} catch (UnknownHostException | SigarException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				System.out.println("Exception: " + e1.getMessage());
 			}
+<<<<<<< Upstream, based on origin/master
 			lblDatos.setText(datos.toString());
 			
+=======
+			txtSO.setText(datos.getSo().toString());
+			txtRAM.setText(datos.getRam().toString() + "GB");
+			txtProcesador.setText(datos.getModeloProcesador().toString());
+			txtVelProcesador.setText(datos.getVelocidadProcesador().toString() + "GHz");
+			txtDD.setText(datos.getDisco().toString() + "GB");
+			
+			txtCPUlibre.setText(datos.getCpuLibre().toString());
+			txtRAMlibre.setText(datos.getRamLibre().toString());
+			txtDDlibre.setText(datos.getDiscoLibre().toString());
+			//lblDatos.setText(datos.toString());
+		}
+		if(e.getSource()==btnParar) {
+			try {
+				cerrarConexion();
+			}catch(Exception e1) {
+				System.out.println("Exception: " + e1.getMessage());
+			}
+>>>>>>> 3df0c96 Interfaz del cliente: funcionalidad cargar (RAM libre sale a 0)
 		}
 		
 	}
-	
 	
 }

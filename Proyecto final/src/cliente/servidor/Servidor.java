@@ -225,7 +225,8 @@ public class Servidor extends JFrame implements ActionListener
 		if(e.getSource()==btnEjecutar)
 		{
 			
-		        	ejecutarConexion(Integer.parseInt(txtPort.getText()));
+		        	//ejecutarConexion(Integer.parseInt(txtPort.getText()));
+		        	ejecutarConexion(4560);
 		      
 		       
 		  
