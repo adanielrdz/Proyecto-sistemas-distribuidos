@@ -200,11 +200,9 @@ public class Servidor extends JFrame implements ActionListener
 		}
 		if(e.getSource()==btnEjecutar)
 		{
-			new Thread(){
-		        public void run() {
+			
 		        	ejecutarConexion(Integer.parseInt(txtPort.getText()));
-		        };
-		    }.start();
+		      
 		       
 		  
 		    System.out.println("Fue con exito");

@@ -135,8 +135,9 @@ public class Cliente extends JFrame implements ActionListener
 		return datos;
 	}
 	//METODO QUE ENVIA LOS DATOS POR EL SOCKET
-	protected void enviarDatos(String ip, int port) throws IOException
+	protected void enviarDatos(String ip, int port) throws IOException, SigarException
 	{
+		obtenerDatos();
 		System.out.println("Se entró a: enviar datos");
 		try{
 			//INSTANCIO EL SOCKET CON LA IP Y PUERTO
@@ -181,6 +182,12 @@ public class Cliente extends JFrame implements ActionListener
 			try {
 				enviarDatos(txtIP.getText(),Integer.parseInt(txtPuerto.getText()));
 			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (NumberFormatException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (SigarException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
