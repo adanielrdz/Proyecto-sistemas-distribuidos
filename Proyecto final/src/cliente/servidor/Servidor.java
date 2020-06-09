@@ -10,16 +10,18 @@ import java.net.Socket;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 public class Servidor extends JFrame implements ActionListener
 {
-	private int port=4560;
+	//4560
 	private ObjectInputStream ois=null;
 	private ObjectOutputStream oos=null;
 	private Socket s=null;
@@ -33,6 +35,7 @@ public class Servidor extends JFrame implements ActionListener
 	private DefaultTableModel modeloClientes=new DefaultTableModel();//MODELO DE LA TABLA CLIENTES
 	private JButton btnCerrar;
 	private JButton btnEjecutar;
+	private JTextField txtPort;
 	public static void main(String[]args)
 	{
 		Servidor server=new Servidor();
@@ -76,18 +79,30 @@ public class Servidor extends JFrame implements ActionListener
 		JScrollPane scrollDatos = new JScrollPane(tablaDatos);
 		scrollDatos.setBounds(194, 31, 830, 331);
 		contentPane.add(scrollDatos);	
+		txtPort = new JTextField();
+		txtPort.setBounds(139, 440, 146, 26);
+		contentPane.add(txtPort);
+		txtPort.setColumns(10);
 		
-		encabezadoTablaDatos();
+		JLabel lblPuerto = new JLabel("Puerto");
+		lblPuerto.setBounds(35, 443, 69, 20);
+		contentPane.add(lblPuerto);
+		encabezadoTablas();
 	}
 	
 	//METODO PARA LEVANTAR LA CONEXION ENTRE EL CLIENTE Y SERVIDOR 
 	
-	protected void ejecutarConexion()
+	protected void ejecutarConexion(int port)
 	{
 		ois = null;
 		oos = null;
 		s = null;
-			
+        try {
+			ss = new ServerSocket(port);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		Thread hilo = new Thread(new Runnable() {
             @Override
            public void run() {
@@ -95,7 +110,7 @@ public class Servidor extends JFrame implements ActionListener
                 {
                   try 
                    {
-                    ss = new ServerSocket(port);
+
                     System.out.println("Esperando conexión entrante en el puerto " + String.valueOf(port) + "...");
                     s = ss.accept();
                     System.out.println("Conexión establecida con: " + s.getInetAddress().getHostName() + "\n\n\n");
@@ -138,9 +153,14 @@ public class Servidor extends JFrame implements ActionListener
 		String discoLibre=datos.getDiscoLibre();
 		String[] data= {modeloProcesador,velocidadProcesador,so,ram,disco,cpuLibre,ramLibre,discoLibre};
 		modeloDatos.addRow(data);
+		
+		String nomCliente=datos.getUsuario();
+		String[] dataCliente= {nomCliente};
+		modeloClientes.addRow(dataCliente);
+		
 	}
 	
-	protected void encabezadoTablaDatos()
+	protected void encabezadoTablas()
 	{
 		modeloDatos.addColumn("Modelo del procesador");
 		modeloDatos.addColumn("Velocidad del procesador");
@@ -150,6 +170,7 @@ public class Servidor extends JFrame implements ActionListener
 		modeloDatos.addColumn("Porcentaje cpu libre");
 		modeloDatos.addColumn("Porcentaje de RAM libre");
 		modeloDatos.addColumn("Porcentaje Disco duro libre");
+		modeloClientes.addColumn("Clientes");
 	}
 	///METODO PARA CERRAR LA CONEXION 
 	protected void cerrarConexion()
@@ -179,9 +200,13 @@ public class Servidor extends JFrame implements ActionListener
 		}
 		if(e.getSource()==btnEjecutar)
 		{
-			
-		       ejecutarConexion();
-		   
+			new Thread(){
+		        public void run() {
+		        	ejecutarConexion(Integer.parseInt(txtPort.getText()));
+		        };
+		    }.start();
+		       
+		  
 		    System.out.println("Fue con exito");
 		}
 	}

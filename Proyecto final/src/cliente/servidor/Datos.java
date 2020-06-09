@@ -100,6 +100,13 @@ public class Datos implements Serializable
 	public void setDiscoLibre(String discoLibre) {
 		this.discoLibre = discoLibre;
 	}
+
+	@Override
+	public String toString() {
+		return "Datos [usuario=" + usuario + "\n"+", modeloProcesador=" + modeloProcesador + "\n"+", velocidadProcesador="
+				+ velocidadProcesador + ", so=" + so + ", ram=" + ram + ", disco=" + disco + ", cpuLibre=" + cpuLibre
+				+ ", ramLibre=" + ramLibre + ", discoLibre=" + discoLibre + "]";
+	}
 	
 	
 	
