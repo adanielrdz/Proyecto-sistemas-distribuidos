@@ -27,8 +27,9 @@ import org.hyperic.sigar.SigarException;
 
 public class Cliente extends JFrame implements ActionListener
 {
+	 static //OBJETOS
 	Datos datos;
-	
+	ArrayList<String> direcciones;
 	//OBJETOS DE NETWOEKING
 	ObjectOutputStream oos;
 	ObjectInputStream ois;
@@ -160,17 +161,122 @@ public class Cliente extends JFrame implements ActionListener
 		}
 	}
 	//METODO QUE CIERRA LA CONEXION 
+	
+	
 	protected void cerrarConexion()
 	{
 		
 	}
 	
-	//METODO QUE EJECUTA LA CONEXION 
-	protected void ejecutarConexion()
+	//METODO QUE ALAMACENA TODAS LAS DIRECCIONES IP	
+	protected ArrayList<String> direccionesIP()
 	{
+		direcciones=new ArrayList<String>();
+		String daniel="25.0.122.89";
+		direcciones.add(daniel);
+		return direcciones;
+	}
+	
+	//ALGORITMO DE RANKEO
+	protected int algoritmoRankeo(Datos dato)
+	{
+		int pts=0;
+		// serie de cpu intel y AMD (mejorable)
+		if(dato.getModeloProcesador().contains("i7")) {
+			pts+=1000;
+		} else if(dato.getModeloProcesador().contains("i5")) {
+			pts+=800;
+		} else if(dato.getModeloProcesador().contains("i3")) {
+			pts+=600;
+		} else if(dato.getModeloProcesador().contains("Pentium")) {
+			pts+=400;
+		} else if(dato.getModeloProcesador().contains("Celeron")) {
+			pts+=200;
+		} else if(dato.getModeloProcesador().contains("A8")) {
+			pts+=300;
+		}
 		
+		// velocidad de cpu
+		int cpufreq = Integer.parseInt(dato.getVelocidadProcesador());
+		if(cpufreq >= 3200) {
+			pts+=1100;
+		}else if(cpufreq < 3200 && cpufreq >= 2400) {
+			pts+=900;
+		} else if(cpufreq < 2400 && cpufreq >= 1900) {
+			pts+=700;
+		} else if(cpufreq < 1900 && cpufreq >= 1400) {
+			pts=500;
+		}else {
+			pts+=200;
+		}
 		
+		// RAM total
+		int mem = Integer.parseInt(dato.getRam());
+		// 12 GB o mas
+		if(mem >= 12288) {
+			pts+=700;
+		}
+		// Entre 8GB y 12 GB (menor a 12GB)
+		else if(mem < 12288 && mem >= 8192) {
+			pts+=500;
+		} 
+		// Entre 4GB y 8GB (menor a 8GB)
+		else if(mem < 8192 && mem >= 4096) {
+			pts+=250;
+		}
+		else {
+			pts+=100;
+		}
 		
+		//CPU libre %
+		double cpuLibre =Double.parseDouble(dato.getCpuLibre());
+		if(cpuLibre >= 90) {
+			pts+=1500;
+		} else if(cpuLibre < 90 && cpuLibre >= 80) {
+			pts+=1350;
+		} else if(cpuLibre < 80 && cpuLibre >= 70) {
+			pts+=1050;
+		} else if(cpuLibre < 70 && cpuLibre >= 60) {
+			pts+=700;
+		} else if(cpuLibre < 60 && cpuLibre >= 50) {
+			pts+=550;
+		} else {
+			pts+=300;
+		}
+		
+		// RAM libre %
+		double ramLibre =Double.parseDouble(dato.getRamLibre());
+		if(ramLibre >= 90) {
+			pts+=1400;
+		} else if(ramLibre < 90 && ramLibre >= 80) {
+			pts+=1250;
+		} else if(ramLibre < 80 && ramLibre >= 70) {
+			pts+=950;
+		} else if(ramLibre < 70 && ramLibre >= 60) {
+			pts+=700;
+		} else if(ramLibre < 60 && ramLibre >= 50) {
+			pts+=550;
+		} else {
+			pts+=300;
+		}
+		
+		// disco libre %
+		double discoLibre = Double.parseDouble(dato.getDiscoLibre());
+		if(discoLibre >= 90) {
+			pts+=1400;
+		} else if(discoLibre < 90 && discoLibre >= 80) {
+			pts+=1250;
+		} else if(discoLibre < 80 && discoLibre >= 70) {
+			pts+=950;
+		} else if(discoLibre < 70 && discoLibre >= 60) {
+			pts+=700;
+		} else if(discoLibre < 60 && discoLibre >= 50) {
+			pts+=550;
+		} else {
+			pts+=300;
+		}
+		
+		return pts;
 	}
 	
 	//METODO PARA LAS ACCIONES DE LOS BOTONES
@@ -202,6 +308,7 @@ public class Cliente extends JFrame implements ActionListener
 				e1.printStackTrace();
 			}
 			lblDatos.setText(datos.toString());
+			
 		}
 		
 	}

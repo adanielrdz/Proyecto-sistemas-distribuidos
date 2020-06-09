@@ -1,5 +1,6 @@
 package cliente.servidor;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -31,8 +32,10 @@ public class Servidor extends JFrame implements ActionListener
 	private JPanel contentPane;
 	private JTable tablaClientes;
 	private JTable tablaDatos;
+	private JTable tablaRank;
 	private DefaultTableModel modeloDatos=new DefaultTableModel();//MODELO DE LA TABLA DATOS
 	private DefaultTableModel modeloClientes=new DefaultTableModel();//MODELO DE LA TABLA CLIENTES
+	private DefaultTableModel modeloRank=new DefaultTableModel();
 	private JButton btnCerrar;
 	private JButton btnEjecutar;
 	private JTextField txtPort;
@@ -47,20 +50,21 @@ public class Servidor extends JFrame implements ActionListener
 	protected void interfazServidor()
 	{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1061, 599);
+		setBounds(100, 100, 1216, 513);
 		setVisible(true);
+		setTitle("Servidor");
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
 		btnCerrar = new JButton("Cerrar conexi\u00F3n");
-		btnCerrar.setBounds(15, 502, 164, 29);
+		btnCerrar.setBounds(15, 389, 164, 35);
 		btnCerrar.addActionListener(this);
 		contentPane.add(btnCerrar);
 		
 		btnEjecutar = new JButton("Levantar conexion");
-		btnEjecutar.setBounds(860, 502, 164, 29);
+		btnEjecutar.setBounds(1015, 386, 164, 41);
 		btnEjecutar.addActionListener(this);
 		contentPane.add(btnEjecutar);
 		
@@ -72,22 +76,39 @@ public class Servidor extends JFrame implements ActionListener
 		tablaDatos.setModel(modeloDatos);
 		contentPane.add(tablaDatos);
 		
+		tablaRank=new JTable();
+		tablaRank.setModel(modeloRank);
+		contentPane.add(tablaRank);
+		
 		JScrollPane scrollClientes = new JScrollPane(tablaClientes);
-		scrollClientes .setBounds(15, 29, 164, 333);
+		scrollClientes .setBounds(15, 59, 164, 121);
 		contentPane.add(scrollClientes );
 		
 		JScrollPane scrollDatos = new JScrollPane(tablaDatos);
-		scrollDatos.setBounds(194, 31, 830, 331);
-		contentPane.add(scrollDatos);	
+		scrollDatos.setBounds(194, 59, 985, 121);
+		contentPane.add(scrollDatos);
+
+		JScrollPane scrollRank = new JScrollPane(tablaRank);
+		scrollRank.setBounds(209, 232, 824, 121);
+		contentPane.add(scrollRank);
+		
 		txtPort = new JTextField();
-		txtPort.setBounds(139, 440, 146, 26);
+		txtPort.setBounds(80, 20, 146, 26);
 		contentPane.add(txtPort);
 		txtPort.setColumns(10);
 		
 		JLabel lblPuerto = new JLabel("Puerto");
-		lblPuerto.setBounds(35, 443, 69, 20);
+		lblPuerto.setBounds(15, 23, 69, 20);
 		contentPane.add(lblPuerto);
+		
+		JLabel lblRankeo = new JLabel("Rankeo");
+		lblRankeo.setFont(new Font("Tahoma", Font.PLAIN, 22));
+		lblRankeo.setBounds(552, 183, 98, 41);
+		contentPane.add(lblRankeo);
+		
 		encabezadoTablas();
+		
+		
 	}
 	
 	//METODO PARA LEVANTAR LA CONEXION ENTRE EL CLIENTE Y SERVIDOR 
@@ -167,10 +188,13 @@ public class Servidor extends JFrame implements ActionListener
 		modeloDatos.addColumn("Sistema operativo");
 		modeloDatos.addColumn("Memoria RAM");
 		modeloDatos.addColumn("Disco duro");
-		modeloDatos.addColumn("Porcentaje cpu libre");
-		modeloDatos.addColumn("Porcentaje de RAM libre");
-		modeloDatos.addColumn("Porcentaje Disco duro libre");
+		modeloDatos.addColumn("CPU libre");
+		modeloDatos.addColumn("RAM libre");
+		modeloDatos.addColumn("Disco duro libre");
 		modeloClientes.addColumn("Clientes");
+		modeloRank.addColumn("Posición");
+		modeloRank.addColumn("Clientes");
+		modeloRank.addColumn("Puntos");
 	}
 	///METODO PARA CERRAR LA CONEXION 
 	protected void cerrarConexion()
