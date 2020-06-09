@@ -1,6 +1,5 @@
 package cliente.servidor;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -12,6 +11,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -30,7 +30,6 @@ import org.hyperic.sigar.SigarException;
 
 public class Cliente extends JFrame implements ActionListener
 {
-	 static //OBJETOS
 	Datos datos;
 	ArrayList<String> direcciones;
 	//OBJETOS DE NETWOEKING
@@ -231,31 +230,32 @@ public class Cliente extends JFrame implements ActionListener
 	protected Datos obtenerDatos() throws SigarException, UnknownHostException
 	{
 		//OBETNER HOSTNAME 
-		InetAddress addr = InetAddress.getByName("25.0.122.89");
-		String usuario ="Daniel";
-		//INSTANCIAS DE OBJETOS DE LA LIBRERIA SIGAR
-		Sigar sigar=new Sigar();
-		Mem mem=sigar.getMem();
-		CpuInfo cpu[]=sigar.getCpuInfoList();
-		CpuInfo info=cpu[0];
-		CpuPerc cpuPorcentaje=sigar.getCpuPerc();
-		File drive = new File("C:\\");
-		//VALORES ESTATICOS
-		String modeloProcesador=info.getModel();
-		String velocidadProcesador=info.getMhz()+"";
-		String so=System.getProperty("os.name");
-		String ram=(mem.getRam()/1000) + "";
-		double discoTotal=drive.getTotalSpace()/1073741824;
-		String disco=String.valueOf(discoTotal);
-		//VALORES DINAMICOS
-		String cpuLibre= (100-cpuPorcentaje.getCombined()*100) + "";
-		double division = (((mem.getRam()-(mem.getActualUsed()/(1024*1024)))/1000)*100)/Double.parseDouble(ram);
-		String ramLibre= division + "";
-		String discoLibre=(((drive.getFreeSpace()/1073741824)*100)/discoTotal) + "";
-		//AGREGAMOS LOS DATOS AL CONSTRUCTOR
-		datos = new Datos(usuario, modeloProcesador,velocidadProcesador,so,ram,disco,cpuLibre,ramLibre,discoLibre);
-		return datos;
+			InetAddress addr = InetAddress.getByName("25.0.122.89");
+			String usuario ="Daniel";
+			//INSTANCIAS DE OBJETOS DE LA LIBRERIA SIGAR
+			Sigar sigar=new Sigar();
+			Mem mem=sigar.getMem();
+			CpuInfo cpu[]=sigar.getCpuInfoList();
+			CpuInfo info=cpu[0];
+			CpuPerc cpuPorcentaje=sigar.getCpuPerc();
+			File drive = new File("C:\\");
+			//VALORES ESTATICOS
+			String modeloProcesador=info.getModel();
+			String velocidadProcesador=info.getMhz()+"";
+			String so=System.getProperty("os.name");
+			String ram=(mem.getRam()/1000) + "";
+			double discoTotal=drive.getTotalSpace()/1073741824;
+			String disco=String.valueOf(discoTotal);
+			//VALORES DINAMICOS
+			String cpuLibre= (100-cpuPorcentaje.getCombined()*100) + "";
+			double division = (((mem.getRam()-(mem.getActualUsed()/(1024*1024)))/1000)*100)/Double.parseDouble(ram);
+			String ramLibre= division + "";
+			String discoLibre=(((drive.getFreeSpace()/1073741824)*100)/discoTotal) + "";
+			//AGREGAMOS LOS DATOS AL CONSTRUCTOR
+			datos = new Datos(usuario, modeloProcesador,velocidadProcesador,so,ram,disco,cpuLibre,ramLibre,discoLibre);
+			return datos;
 	}
+	
 	//METODO QUE ENVIA LOS DATOS POR EL SOCKET
 	protected void enviarDatos(String ip, int port) throws IOException, SigarException
 	{
@@ -282,8 +282,6 @@ public class Cliente extends JFrame implements ActionListener
 		}
 	}
 	//METODO QUE CIERRA LA CONEXION 
-	
-	
 	protected void cerrarConexion()
 	{
 		
@@ -299,106 +297,106 @@ public class Cliente extends JFrame implements ActionListener
 	}
 	
 	//ALGORITMO DE RANKEO
-	protected int algoritmoRankeo(Datos dato)
-	{
-		int pts=0;
-		// serie de cpu intel y AMD (mejorable)
-		if(dato.getModeloProcesador().contains("i7")) {
-			pts+=1000;
-		} else if(dato.getModeloProcesador().contains("i5")) {
-			pts+=800;
-		} else if(dato.getModeloProcesador().contains("i3")) {
-			pts+=600;
-		} else if(dato.getModeloProcesador().contains("Pentium")) {
-			pts+=400;
-		} else if(dato.getModeloProcesador().contains("Celeron")) {
-			pts+=200;
-		} else if(dato.getModeloProcesador().contains("A8")) {
-			pts+=300;
+		protected int algoritmoRankeo(Datos dato)
+		{
+			int pts=0;
+			// serie de cpu intel y AMD (mejorable)
+			if(dato.getModeloProcesador().contains("i7")) {
+				pts+=1000;
+			} else if(dato.getModeloProcesador().contains("i5")) {
+				pts+=800;
+			} else if(dato.getModeloProcesador().contains("i3")) {
+				pts+=600;
+			} else if(dato.getModeloProcesador().contains("Pentium")) {
+				pts+=400;
+			} else if(dato.getModeloProcesador().contains("Celeron")) {
+				pts+=200;
+			} else if(dato.getModeloProcesador().contains("A8")) {
+				pts+=300;
+			}
+			
+			// velocidad de cpu
+			int cpufreq = Integer.parseInt(dato.getVelocidadProcesador());
+			if(cpufreq >= 3200) {
+				pts+=1100;
+			}else if(cpufreq < 3200 && cpufreq >= 2400) {
+				pts+=900;
+			} else if(cpufreq < 2400 && cpufreq >= 1900) {
+				pts+=700;
+			} else if(cpufreq < 1900 && cpufreq >= 1400) {
+				pts=500;
+			}else {
+				pts+=200;
+			}
+			
+			// RAM total
+			int mem = Integer.parseInt(dato.getRam());
+			// 12 GB o mas
+			if(mem >= 12288) {
+				pts+=700;
+			}
+			// Entre 8GB y 12 GB (menor a 12GB)
+			else if(mem < 12288 && mem >= 8192) {
+				pts+=500;
+			} 
+			// Entre 4GB y 8GB (menor a 8GB)
+			else if(mem < 8192 && mem >= 4096) {
+				pts+=250;
+			}
+			else {
+				pts+=100;
+			}
+			
+			//CPU libre %
+			double cpuLibre =Double.parseDouble(dato.getCpuLibre());
+			if(cpuLibre >= 90) {
+				pts+=1500;
+			} else if(cpuLibre < 90 && cpuLibre >= 80) {
+				pts+=1350;
+			} else if(cpuLibre < 80 && cpuLibre >= 70) {
+				pts+=1050;
+			} else if(cpuLibre < 70 && cpuLibre >= 60) {
+				pts+=700;
+			} else if(cpuLibre < 60 && cpuLibre >= 50) {
+				pts+=550;
+			} else {
+				pts+=300;
+			}
+			
+			// RAM libre %
+			double ramLibre =Double.parseDouble(dato.getRamLibre());
+			if(ramLibre >= 90) {
+				pts+=1400;
+			} else if(ramLibre < 90 && ramLibre >= 80) {
+				pts+=1250;
+			} else if(ramLibre < 80 && ramLibre >= 70) {
+				pts+=950;
+			} else if(ramLibre < 70 && ramLibre >= 60) {
+				pts+=700;
+			} else if(ramLibre < 60 && ramLibre >= 50) {
+				pts+=550;
+			} else {
+				pts+=300;
+			}
+			
+			// disco libre %
+			double discoLibre = Double.parseDouble(dato.getDiscoLibre());
+			if(discoLibre >= 90) {
+				pts+=1400;
+			} else if(discoLibre < 90 && discoLibre >= 80) {
+				pts+=1250;
+			} else if(discoLibre < 80 && discoLibre >= 70) {
+				pts+=950;
+			} else if(discoLibre < 70 && discoLibre >= 60) {
+				pts+=700;
+			} else if(discoLibre < 60 && discoLibre >= 50) {
+				pts+=550;
+			} else {
+				pts+=300;
+			}
+			
+			return pts;
 		}
-		
-		// velocidad de cpu
-		int cpufreq = Integer.parseInt(dato.getVelocidadProcesador());
-		if(cpufreq >= 3200) {
-			pts+=1100;
-		}else if(cpufreq < 3200 && cpufreq >= 2400) {
-			pts+=900;
-		} else if(cpufreq < 2400 && cpufreq >= 1900) {
-			pts+=700;
-		} else if(cpufreq < 1900 && cpufreq >= 1400) {
-			pts=500;
-		}else {
-			pts+=200;
-		}
-		
-		// RAM total
-		int mem = Integer.parseInt(dato.getRam());
-		// 12 GB o mas
-		if(mem >= 12288) {
-			pts+=700;
-		}
-		// Entre 8GB y 12 GB (menor a 12GB)
-		else if(mem < 12288 && mem >= 8192) {
-			pts+=500;
-		} 
-		// Entre 4GB y 8GB (menor a 8GB)
-		else if(mem < 8192 && mem >= 4096) {
-			pts+=250;
-		}
-		else {
-			pts+=100;
-		}
-		
-		//CPU libre %
-		double cpuLibre =Double.parseDouble(dato.getCpuLibre());
-		if(cpuLibre >= 90) {
-			pts+=1500;
-		} else if(cpuLibre < 90 && cpuLibre >= 80) {
-			pts+=1350;
-		} else if(cpuLibre < 80 && cpuLibre >= 70) {
-			pts+=1050;
-		} else if(cpuLibre < 70 && cpuLibre >= 60) {
-			pts+=700;
-		} else if(cpuLibre < 60 && cpuLibre >= 50) {
-			pts+=550;
-		} else {
-			pts+=300;
-		}
-		
-		// RAM libre %
-		double ramLibre =Double.parseDouble(dato.getRamLibre());
-		if(ramLibre >= 90) {
-			pts+=1400;
-		} else if(ramLibre < 90 && ramLibre >= 80) {
-			pts+=1250;
-		} else if(ramLibre < 80 && ramLibre >= 70) {
-			pts+=950;
-		} else if(ramLibre < 70 && ramLibre >= 60) {
-			pts+=700;
-		} else if(ramLibre < 60 && ramLibre >= 50) {
-			pts+=550;
-		} else {
-			pts+=300;
-		}
-		
-		// disco libre %
-		double discoLibre = Double.parseDouble(dato.getDiscoLibre());
-		if(discoLibre >= 90) {
-			pts+=1400;
-		} else if(discoLibre < 90 && discoLibre >= 80) {
-			pts+=1250;
-		} else if(discoLibre < 80 && discoLibre >= 70) {
-			pts+=950;
-		} else if(discoLibre < 70 && discoLibre >= 60) {
-			pts+=700;
-		} else if(discoLibre < 60 && discoLibre >= 50) {
-			pts+=550;
-		} else {
-			pts+=300;
-		}
-		
-		return pts;
-	}
 	
 	//METODO PARA LAS ACCIONES DE LOS BOTONES
 	@Override
@@ -432,10 +430,6 @@ public class Cliente extends JFrame implements ActionListener
 				e1.printStackTrace();
 				System.out.println("Exception: " + e1.getMessage());
 			}
-<<<<<<< Upstream, based on origin/master
-			lblDatos.setText(datos.toString());
-			
-=======
 			txtSO.setText(datos.getSo().toString());
 			txtRAM.setText(datos.getRam().toString() + "GB");
 			txtProcesador.setText(datos.getModeloProcesador().toString());
@@ -453,7 +447,6 @@ public class Cliente extends JFrame implements ActionListener
 			}catch(Exception e1) {
 				System.out.println("Exception: " + e1.getMessage());
 			}
->>>>>>> 3df0c96 Interfaz del cliente: funcionalidad cargar (RAM libre sale a 0)
 		}
 		
 	}
