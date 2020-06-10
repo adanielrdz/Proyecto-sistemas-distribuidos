@@ -134,12 +134,12 @@ public class Servidor extends JFrame implements ActionListener
 	
 	protected void ejecutarConexion(int port)
 	{
-		ois2 = null;
-		oos2 = null;
-		s2 = null;
-		ss2 = null;
+		ois = null;
+		oos = null;
+		s = null;
+		ss = null;
         try {
-			ss2 = new ServerSocket(port);
+			ss = new ServerSocket(port);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -152,12 +152,12 @@ public class Servidor extends JFrame implements ActionListener
                    {
                 	Thread.sleep(3000);
                     System.out.println("Esperando conexión entrante en el puerto " + String.valueOf(port) + "...");
-                    s2 = ss2.accept();
+                    s = ss.accept();
                     
-                    System.out.println("Conexión establecida con: " + s2.getInetAddress() + "\n\n\n");
-                    ois2 = new ObjectInputStream(s2.getInputStream());
-                	Datos data = (Datos)ois2.readObject();
-                	cargarDatos(data, s2.getInetAddress().toString());    
+                    System.out.println("Conexión establecida con: " + s.getInetAddress() + "\n\n\n");
+                    ois = new ObjectInputStream(s.getInputStream());
+                	Datos data = (Datos)ois.readObject();
+                	cargarDatos(data, s.getInetAddress().toString());    
                 	
                     } catch (ClassNotFoundException e) {
 						// TODO Auto-generated catch block
@@ -383,6 +383,7 @@ public class Servidor extends JFrame implements ActionListener
 		
 		try {
 			enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
+			System.out.println("mayor rank: "+puntuaciones[4]);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -404,17 +405,18 @@ public class Servidor extends JFrame implements ActionListener
 		
 		
 		try {
-			s=new Socket(IpMejorRank,4066);
-			ss = new ServerSocket(4066);
-			s = ss.accept();
+			s2=new Socket(IpMejorRank,4066);
+			ss2 = new ServerSocket(4066);
+			s2 = ss2.accept();
 			
 			ObjectOutputStream oos2 = new ObjectOutputStream(s.getOutputStream());
 			oos2.writeObject(IpMejorRank);
 		} catch(Exception e) {
+			//Excepción de "Connection refused: connect"
 			System.out.println(e.getMessage());
 		} finally {
-			if(s != null) s.close();
-			if(ss != null) ss.close();
+			if(s2 != null) s2.close();
+			if(ss2 != null) ss2.close();
 		}
 		
 		

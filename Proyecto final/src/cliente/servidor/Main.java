@@ -96,10 +96,10 @@ public class Main extends JFrame implements ActionListener
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
-		setVisible(true);
 		btnEmpezar = new JButton("Empezar!!!");
 		btnEmpezar.addActionListener(this);
 		contentPane.add(btnEmpezar, BorderLayout.CENTER);
+		setVisible(true);
 	}
 	/* Este metodo envia a todos la nueva direccion */
 	private void enviarDifusionIp(String nuevaIpServidor) {

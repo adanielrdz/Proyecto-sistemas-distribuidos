@@ -39,9 +39,9 @@ public class Cliente extends JFrame implements ActionListener
 	Datos datos;
 	ArrayList<String> direcciones;
 	//OBJETOS DE NETWOEKING
-	ObjectOutputStream oos;
-	ObjectInputStream ois;
-	Socket s = null;
+	ObjectOutputStream oos, oos2;
+	ObjectInputStream ois, ois2;
+	Socket s = null, s2 = null;
 	//OBJETOS DE JFRANE
 	private JLabel txtPuerto, txtIPusuario;
 	private JPanel contentPane;
@@ -69,7 +69,7 @@ public class Cliente extends JFrame implements ActionListener
 	private String erik = "25.18.90.103";
 	private String jose = "25.11.6.101";
 	private String ivan = "25.12.252.241";
-	private ServerSocket ss;
+	private ServerSocket ss, ss2;
 	private boolean flagCargar;
 	/*
 	public static void main(String[]args) throws SigarException, IOException
@@ -303,9 +303,11 @@ public class Cliente extends JFrame implements ActionListener
 			System.out.println("Datos enviados");
 		}catch(Exception ex){
 			//ex.printStackTrace();
+			//ESTE NO ES
 			System.out.println(ex.getMessage());
 		}
 	}
+	
 	//METODO QUE CIERRA LA CONEXION 
 	protected void cerrarConexion() throws IOException
 	{
@@ -317,10 +319,10 @@ public class Cliente extends JFrame implements ActionListener
 	//METODO RECIBIR PUNTU
 	protected void recibirDatos()
 	{
-		ois = null;
-		s = null;
+		ois2 = null;
+		s2 = null;
         try {
-			ss = new ServerSocket(4066);
+			ss2 = new ServerSocket(4066);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -332,13 +334,13 @@ public class Cliente extends JFrame implements ActionListener
                   try 
                    {
                 	Thread.sleep(3000);
-                    s = ss.accept();
-                    ois = new ObjectInputStream(s.getInputStream());
+                    s2 = ss2.accept();
+                    ois2 = new ObjectInputStream(s2.getInputStream());
                     
                     // leo la ip enviada desde la difusion del nuevo servidor
                     // y la asigno al text field para que se tome de ahÃ­ cuando se cree
                     // un nuevo socket.
-                	txtIPdestino.setText((String)ois.readObject());
+                	txtIPdestino.setText((String)ois2.readObject());
                    
                 	
                     } catch (ClassNotFoundException e) {
@@ -417,17 +419,19 @@ public class Cliente extends JFrame implements ActionListener
 			}
 		}
 		
-		if(e.getSource()==btnParar && !parar) {
-			if(enviandoDatos) {
-				System.out.println("Dejando de enviar datos...");
-				try {
-					parar = true;
-					cerrarConexion();
-					System.out.println("Se cerró la conexión");
-				}catch(Exception e1) {
-					System.out.println("Exception: " + e1.getMessage());
+		if(e.getSource()==btnParar) {
+			if(!parar) {
+				if(enviandoDatos) {
+					System.out.println("Dejando de enviar datos...");
+					try {
+						parar = true;
+						cerrarConexion();
+						System.out.println("Se cerró la conexión");
+					}catch(Exception e1) {
+						System.out.println("Exception: " + e1.getMessage());
+					}
+					enviandoDatos = false;
 				}
-				enviandoDatos = false;
 			}
 			
 		}
