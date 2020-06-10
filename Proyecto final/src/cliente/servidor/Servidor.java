@@ -8,6 +8,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -36,6 +38,18 @@ public class Servidor extends JFrame implements ActionListener
 	private JButton btnCerrar;
 	private JButton btnEjecutar;
 	private JTextField txtPort;
+	
+	private String daniel = "/25.0.122.89";
+	private String cesar = "/25.24.184.239";
+	private String erik = "/25.18.90.103";
+	private String jose = "/25.11.6.101";
+	private String ivan = "/25.12.252.241";
+	
+	private int danielPts = 0;
+	private int cesarPts = 0;
+	private int erikPts = 0;
+	private int josePts = 0;
+	private int ivanPts = 0;
 	
 	private boolean clienteExiste;
 	
@@ -100,6 +114,7 @@ public class Servidor extends JFrame implements ActionListener
 		
 		setVisible(true);
 		
+		
 		encabezadoTablas();
 		
 		
@@ -125,12 +140,13 @@ public class Servidor extends JFrame implements ActionListener
                   try 
                    {
 
-                    System.out.println("Esperando conexión entrante en el puerto " + String.valueOf(port) + "...");
+                    System.out.println("Esperando conexiï¿½n entrante en el puerto " + String.valueOf(port) + "...");
                     s = ss.accept();
-                    System.out.println("Conexión establecida con: " + s.getInetAddress().getHostName() + "\n\n\n");
+                    
+                    System.out.println("Conexiï¿½n establecida con: " + s.getInetAddress() + "\n\n\n");
                     ois = new ObjectInputStream(s.getInputStream());
                 	Datos data = (Datos)ois.readObject();
-                	cargarDatos(data);    
+                	cargarDatos(data, s.getInetAddress().toString());    
                 	
                     } catch (ClassNotFoundException e) {
 						// TODO Auto-generated catch block
@@ -167,7 +183,7 @@ public class Servidor extends JFrame implements ActionListener
 		}
 		
 		// velocidad de cpu
-		int cpufreq = Integer.parseInt(datos.getVelocidadProcesador());
+		double cpufreq = Double.parseDouble(datos.getVelocidadProcesador());
 		if(cpufreq >= 3200) {
 			pts+=1100;
 		}else if(cpufreq < 3200 && cpufreq >= 2400) {
@@ -250,10 +266,10 @@ public class Servidor extends JFrame implements ActionListener
 	}
 	
 	//METODO PARA CARGAR EL MODELO DE LA TABLA Y QUE SEA DINAMICA
-	protected void cargarDatos(Datos datos)
+	protected void cargarDatos(Datos datos, String ip)
 	{
-		//Si el nombre de cliente ya está registrado, no lo vuelva a agregar
-		//en caso de que ya esté registrado, que sobrescriba los valores recibidos del cliente
+		//Si el nombre de cliente ya estï¿½ registrado, no lo vuelva a agregar
+		//en caso de que ya estï¿½ registrado, que sobrescriba los valores recibidos del cliente
 		
 		String nomCliente=datos.getUsuario();//Obtiene el usuario
 		//String[] dataCliente = {nomCliente};
@@ -275,10 +291,44 @@ public class Servidor extends JFrame implements ActionListener
 		String ramLibre=datos.getRamLibre();
 		String discoLibre=datos.getDiscoLibre();
 		String[] data= {nomCliente,modeloProcesador,velocidadProcesador + " GHz",so,ram + " GB",disco + " GB",cpuLibre + " %",ramLibre + " %",discoLibre + " %"};
-		modeloDatos.addRow(data);
+		//modeloDatos.addRow(data);
 		
+	
+		if(ip.equals(daniel)) {
+			for(int i=0; i<9; i++) {
+				modeloDatos.setValueAt(data[i], 0, i);
+			}
+			danielPts = algoritmoRankeo(datos);
+		}else if(ip.equals(cesar)) {
+			for(int i=0; i<9; i++) {
+				modeloDatos.setValueAt(data[i], 1, i);
+			}
+			cesarPts = algoritmoRankeo(datos);
+		}else if(ip.equals(erik)) {
+			for(int i=0; i<9; i++) {
+				modeloDatos.setValueAt(data[i], 2, i);
+			}
+			erikPts = algoritmoRankeo(datos);
+		} else if(ip.equals(jose)) {
+			for(int i=0; i<9; i++) {
+				modeloDatos.setValueAt(data[i], 3, i);
+			}
+			josePts = algoritmoRankeo(datos);
+		} else if(ip.equals(ivan)){
+			for(int i=0; i<9; i++) {
+				modeloDatos.setValueAt(data[i], 4, i);
+			}
+			ivanPts = algoritmoRankeo(datos);
+		}
 		
+		int[] puntuaciones = {danielPts,cesarPts,erikPts,josePts,ivanPts};
 		
+		// ordenamos las puntuaciones
+		Arrays.sort(puntuaciones);
+		
+		for(int i=0; i<5; i++) {
+			modeloRank.setValueAt(puntuaciones[i], i, 2);
+		}
 		/*
 		//TABLA Y MODEO DE RANKEO
 		String puntos=String.valueOf(algoritmoRankeo(datos));
@@ -298,9 +348,25 @@ public class Servidor extends JFrame implements ActionListener
 		modeloDatos.addColumn("CPU libre");
 		modeloDatos.addColumn("RAM libre");
 		modeloDatos.addColumn("Disco duro libre");
-		modeloRank.addColumn("Posición");
+		modeloRank.addColumn("Posiciï¿½n");
 		modeloRank.addColumn("Clientes");
 		modeloRank.addColumn("Puntos");
+		
+		// crear filas vacias
+		String[] datosVacios = {"","","","","","","","",""};
+		modeloDatos.addRow(datosVacios);
+		modeloDatos.addRow(datosVacios);
+		modeloDatos.addRow(datosVacios);
+		modeloDatos.addRow(datosVacios);
+		modeloDatos.addRow(datosVacios);
+		
+		String[] datosVaciosRank = {"","",""};
+		modeloRank.addRow(datosVaciosRank);
+		modeloRank.addRow(datosVaciosRank);
+		modeloRank.addRow(datosVaciosRank);
+		modeloRank.addRow(datosVaciosRank);
+		modeloRank.addRow(datosVaciosRank);
+		
 	}
 
 	///METODO PARA CERRAR LA CONEXION 
