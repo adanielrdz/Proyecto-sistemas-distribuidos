@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
@@ -33,6 +32,7 @@ import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
+
 public class Cliente extends JFrame implements ActionListener
 {
 	Datos datos;
@@ -41,10 +41,11 @@ public class Cliente extends JFrame implements ActionListener
 	ObjectOutputStream oos;
 	ObjectInputStream ois;
 	Socket s = null;
+	//OBJETOS DE JFRAME
+
 	//OBJETOS DE JFRANE
 	private JLabel txtPuerto, txtIPusuario;
 	private JPanel contentPane;
-	private JFrame frameInterfaz;
 	private JTextField txtIPdestino;
 	private JTextField txtRAM;
 	private JTextField txtProcesador;
@@ -62,25 +63,16 @@ public class Cliente extends JFrame implements ActionListener
 	private String ipLocal="25.24.184.239";	//IP propia de Hamachi
 	private String cliente = "Daniel";			//Nombre propio
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private String daniel = "25.0.122.89";
-	private String cesar = "25.24.184.239";
-	private String erik = "25.18.90.103";
-	private String jose = "25.11.6.101";
-	private String ivan = "25.12.252.241";
-	private ServerSocket ss;
 	private boolean flagCargar;
-	/*
+	
 	public static void main(String[]args) throws SigarException, IOException
 	{
-		//Cliente c=new Cliente();
-		//c.interfazCliente();
+		Cliente c=new Cliente();
+		c.interfazCliente();
 	}
-	*/
+	
 	//INTERFAZ DEL CLIENTE 
-	public JTextField getTxtIp() {
-		return txtIPdestino;
-	}
-	protected JFrame interfazCliente()
+	protected void interfazCliente()
 	{
 		setTitle("SDP: Cliente");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -242,8 +234,7 @@ public class Cliente extends JFrame implements ActionListener
 		txtIPusuario.setBounds(352, 14, 103, 14);
 		panel_2.add(txtIPusuario);
 		//
-		//setVisible(true);
-		return this;
+		setVisible(true);
 		
 	}
 	
@@ -281,7 +272,7 @@ public class Cliente extends JFrame implements ActionListener
 	protected void enviarDatos(String ip, int port) throws IOException, SigarException
 	{
 		obtenerDatos();
-		System.out.println("Se entr� a: enviar datos");
+		System.out.println("Se entró a: enviar datos");
 		try{
 			System.out.println("Antes de cargar el socket");
 			//INSTANCIO EL SOCKET CON LA IP Y PUERTO
@@ -306,48 +297,12 @@ public class Cliente extends JFrame implements ActionListener
 		System.out.println("Conexion cerrada");
 	}
 
-	//METODO RECIBIR PUNTU
-	protected void recibirDatos()
+	//METODO QUE ALAMACENA TODAS LAS DIRECCIONES IP	
+	protected ArrayList<String> direccionesIP()
 	{
-		ois = null;
-		s = null;
-        try {
-			ss = new ServerSocket(4066);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		Thread hilo = new Thread(new Runnable() {
-           @Override
-           public void run() {
-             while (true) 
-                {
-                  try 
-                   {
-                	Thread.sleep(3000);
-                    s = ss.accept();
-                    ois = new ObjectInputStream(s.getInputStream());
-                    
-                    // leo la ip enviada desde la difusion del nuevo servidor
-                    // y la asigno al text field para que se tome de ahí cuando se cree
-                    // un nuevo socket.
-                	txtIPdestino.setText((String)ois.readObject());
-                   
-                	
-                    } catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} 
-                }
-            }
-        });
-		
-        hilo.start();
+		direcciones=new ArrayList<String>();
+		direcciones.add(ipLocal);
+		return direcciones;
 	}
 
 	//METODO PARA LAS ACCIONES DE LOS BOTONES
