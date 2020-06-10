@@ -8,7 +8,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ public class Servidor extends JFrame implements ActionListener
 	private Socket s=null;
 	private ServerSocket ss;
 	//OBJETOS DEL JFRAME
-	private JFrame frameServidor;
 	private JPanel contentPane;
 	private JTable tablaDatos;
 	private JTable tablaRank;
@@ -58,21 +56,17 @@ public class Servidor extends JFrame implements ActionListener
 		"Daniel","Cesar","Erik","Jose","Ivan"
 	};
 	
-	int[] puntuaciones={danielPts,cesarPts,erikPts,josePts,ivanPts};
+	private boolean clienteExiste;
 	
-	//private boolean clienteExiste;
-	public int[] getPuntuaciones() {
-		return puntuaciones;
+	public static void main(String[]args)
+	{
+		Servidor server=new Servidor();
+		server.interfazServidor();
+		
 	}
-	HashMap<Integer,String> puntuacionesNombres = new HashMap<Integer,String>();
-	HashMap<Integer,String> puntuacionesIp = new HashMap<Integer,String>();
 	
-	public HashMap<Integer, String> getPuntuacionesNombres() {
-		return puntuacionesNombres;
-	}
-
 	//INTERFAZ DEL SERVER
-	protected JFrame interfazServidor()
+	protected void interfazServidor()
 	{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1216, 513);
@@ -123,11 +117,12 @@ public class Servidor extends JFrame implements ActionListener
 		lblRankeo.setBounds(552, 183, 98, 41);
 		contentPane.add(lblRankeo);
 		
-		//setVisible(true);
+		setVisible(true);
+		
 		
 		encabezadoTablas();
 		
-		return this;
+		
 	}
 	
 	//METODO PARA LEVANTAR LA CONEXION ENTRE EL CLIENTE Y SERVIDOR 
@@ -149,7 +144,7 @@ public class Servidor extends JFrame implements ActionListener
                 {
                   try 
                    {
-                	Thread.sleep(3000);
+
                     System.out.println("Esperando conexi�n entrante en el puerto " + String.valueOf(port) + "...");
                     s = ss.accept();
                     
@@ -162,9 +157,6 @@ public class Servidor extends JFrame implements ActionListener
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} 
@@ -340,30 +332,12 @@ public class Servidor extends JFrame implements ActionListener
 			ivanPts = algoritmoRankeo(datos);
 		}
 		
-		puntuaciones[0]=danielPts;
-		puntuaciones[1]=cesarPts;
-		puntuaciones[2]=erikPts;
-		puntuaciones[3]=josePts;
-		puntuaciones[4]=ivanPts;
-	
+		int[] puntuaciones = {danielPts,cesarPts,erikPts,josePts,ivanPts};
+		HashMap<Integer,String> puntuacionesNombres = new HashMap<Integer,String>();
 		
 		for(int i=0; i<5; i++) {
 			puntuacionesNombres.put(puntuaciones[i],nombres[i]);
 		}
-		
-		// hardcode direcciones ip nombres
-		/*
-		 * private String daniel = "/25.0.122.89";
-	private String cesar = "/25.24.184.239";
-	private String erik = "/25.18.90.103";
-	private String jose = "/25.11.6.101";
-	private String ivan = "/25.12.252.241";*/
-		
-		puntuacionesIp.put(danielPts,"25.0.122.89");
-		puntuacionesIp.put(cesarPts,"25.24.184.239");
-		puntuacionesIp.put(erikPts,"25.18.90.103");
-		puntuacionesIp.put(josePts,"25.11.6.101");
-		puntuacionesIp.put(ivanPts, "25.12.252.241");
 		
 		Arrays.sort(puntuaciones);
 		// ordenamos las puntuaciones
@@ -374,17 +348,7 @@ public class Servidor extends JFrame implements ActionListener
 			modeloRank.setValueAt(i+1, i, 0);
 			
 			modeloRank.setValueAt(puntuacionesNombres.get(puntuaciones[4-i]), i, 1);
-			
 		}
-		
-		try {
-			enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
 		/*
 		//TABLA Y MODEO DE RANKEO
 		String puntos=String.valueOf(algoritmoRankeo(datos));
@@ -393,34 +357,6 @@ public class Servidor extends JFrame implements ActionListener
 		*/
 	}
 	
-	//ENVIO DE ALERTA 
-	protected void enviarAlerta(String IpMejorRank) throws UnknownHostException, IOException
-	{
-		
-		
-		
-		try {
-			s=new Socket(IpMejorRank,4066);
-			ss = new ServerSocket(4066);
-			s = ss.accept();
-			
-			ObjectOutputStream oos2 = new ObjectOutputStream(s.getOutputStream());
-			oos2.writeObject(IpMejorRank);
-		} catch(Exception e) {
-			
-		} finally {
-			if(s != null) s.close();
-			if(ss != null) ss.close();
-		}
-		
-		
-		
-		
-		
-		
-		
-		
-	}
 	
 	protected void encabezadoTablas()
 	{
@@ -433,7 +369,7 @@ public class Servidor extends JFrame implements ActionListener
 		modeloDatos.addColumn("CPU libre");
 		modeloDatos.addColumn("RAM libre");
 		modeloDatos.addColumn("Disco duro libre");
-		modeloRank.addColumn("Posicion");
+		modeloRank.addColumn("Posici�n");
 		modeloRank.addColumn("Clientes");
 		modeloRank.addColumn("Puntos");
 		
