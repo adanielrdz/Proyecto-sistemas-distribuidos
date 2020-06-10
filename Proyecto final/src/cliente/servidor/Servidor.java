@@ -42,6 +42,8 @@ public class Servidor extends JFrame implements ActionListener
 	private JButton btnEjecutar;
 	private JTextField txtPort;
 	
+	private boolean serverIniciado = false;
+	
 	private String daniel = "/25.0.122.89";
 	private String cesar = "/25.24.184.239";
 	private String erik = "/25.18.90.103";
@@ -131,53 +133,37 @@ public class Servidor extends JFrame implements ActionListener
 	}
 	
 	//METODO PARA LEVANTAR LA CONEXION ENTRE EL CLIENTE Y SERVIDOR 
-	
-	protected void ejecutarConexion(int port)
-	{
+	protected void ejecutarConexion(int port){
 		ois = null;
 		oos = null;
 		s = null;
 		ss = null;
         try {
 			ss = new ServerSocket(port);
+			System.out.println("////Puerto de servidor abierto////");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		Thread hilo = new Thread(new Runnable() {
            @Override
            public void run() {
-             while (true) 
-                {
-                  try 
-                   {
-                	Thread.sleep(3000);
-                    System.out.println("Esperando conexión entrante en el puerto " + String.valueOf(port) + "...");
+             while (true) {
+                  try {
+                	
                     s = ss.accept();
-                    
-                    System.out.println("Conexión establecida con: " + s.getInetAddress() + "\n\n\n");
+                    System.out.println("Conexión establecida con: " + s.getInetAddress() + "\n");
                     ois = new ObjectInputStream(s.getInputStream());
                 	Datos data = (Datos)ois.readObject();
                 	cargarDatos(data, s.getInetAddress().toString());    
-                	
-                    } catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
+                	//Thread.sleep(5000);
+                    } catch (ClassNotFoundException | IOException /*| InterruptedException*/ e) {
 						e.printStackTrace();
-						System.out.println("ClassNotFound: " + e.getMessage());
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						System.out.println("IOException: " + e.getMessage());
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						System.out.println("Interrupted: " + e.getMessage());
-					} 
+						System.out.println("!Error: " + e.getMessage());
+					}
                 }
             }
         });
-		
         hilo.start();
-		
 	}
 	
 	//METODO PARA EL ALGORITMO DE RANKEO
@@ -299,10 +285,11 @@ public class Servidor extends JFrame implements ActionListener
 		}
 		*/
 		
-		
+		/*
 		if(datos.getVelocidadProcesador().contains(",")) {
 			datos.setVelocidadProcesador(datos.getVelocidadProcesador().replace(",", "."));
 		}
+		*/
 		
 		String modeloProcesador=datos.getModeloProcesador();
 		String velocidadProcesador=datos.getVelocidadProcesador();
@@ -383,10 +370,9 @@ public class Servidor extends JFrame implements ActionListener
 		
 		try {
 			enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
-			System.out.println("mayor rank: "+puntuaciones[4]);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.out.println("!Error: " + e.getMessage());
 		}
 		
 		
@@ -401,35 +387,29 @@ public class Servidor extends JFrame implements ActionListener
 	//ENVIO DE ALERTA 
 	protected void enviarAlerta(String IpMejorRank) throws UnknownHostException, IOException
 	{
-		
-		
-		
 		try {
-			s2=new Socket(IpMejorRank,4066);
-			ss2 = new ServerSocket(4066);
-			s2 = ss2.accept();
-			
-			ObjectOutputStream oos2 = new ObjectOutputStream(s.getOutputStream());
+			System.out.println("Convertir en servidor la ip: " + IpMejorRank);
+			s2 = new Socket(IpMejorRank,4066);
+			System.out.println("nuevo socket cargado");
+			//ss2 = new ServerSocket(4066);
+			//s2 = ss2.accept();
+			oos2 = new ObjectOutputStream(s2.getOutputStream());
 			oos2.writeObject(IpMejorRank);
 		} catch(Exception e) {
 			//Excepción de "Connection refused: connect"
-			System.out.println(e.getMessage());
+			e.getStackTrace();
+			System.out.println("!Error: " + e.getMessage());
 		} finally {
 			if(s2 != null) s2.close();
 			if(ss2 != null) ss2.close();
+			if(oos2 != null) oos2.close();
 		}
-		
-		
-		
-		
-		
-		
-		
 		
 	}
 	
 	protected void encabezadoTablas()
 	{
+		//Agregar encabezado de las tablas
 		modeloDatos.addColumn("Clientes");
 		modeloDatos.addColumn("Modelo del procesador");
 		modeloDatos.addColumn("Velocidad del procesador");
@@ -450,7 +430,6 @@ public class Servidor extends JFrame implements ActionListener
 		modeloDatos.addRow(datosVacios);
 		modeloDatos.addRow(datosVacios);
 		modeloDatos.addRow(datosVacios);
-		
 		String[] datosVaciosRank = {"","",""};
 		modeloRank.addRow(datosVaciosRank);
 		modeloRank.addRow(datosVaciosRank);
@@ -467,31 +446,34 @@ public class Servidor extends JFrame implements ActionListener
             ois.close();
             oos.close();
             s.close();
+            System.out.println("////Puerto de servidor cerrado///");
         } catch (IOException e) {
+        	e.getStackTrace();
+        	System.out.println("!Error: " + e.getMessage());
         } finally {
-            System.out.println("Conexion cerrada....");
-            System.exit(0);
-
+///////////////////////////////////////////////////////////////
+            //No creo que deba salirse del programa
+            //System.exit(0);
+///////////////////////////////////////////////////////////////
         }
 	}
-
 	
 	//METODO PARA LOS ACCIONES DE LOS BOTONOES DE LA INTERFAZ
 	@Override
-	public void actionPerformed(ActionEvent e) 
-	{
-		// TODO Auto-generated method stub
-		if(e.getSource()==btnCerrar)
-		{
+	public void actionPerformed(ActionEvent e){
+		if(e.getSource()==btnCerrar){
 			cerrarConexion();
 			JOptionPane.showMessageDialog(null, "Se ha cerrado la conexion");
 		}
-		if(e.getSource()==btnEjecutar)
-		{
+		if(e.getSource()==btnEjecutar){
+			if(!txtPort.getText().isEmpty() && !serverIniciado) {
+				ejecutarConexion(Integer.parseInt(txtPort.getText()));
+				serverIniciado = true;
+				txtPort.setEditable(false);
+			}else {
+				JOptionPane.showMessageDialog(null, "Ingrese un puerto para levantar conexión");
+			}
 			
-			ejecutarConexion(Integer.parseInt(txtPort.getText()));
-		    
-		    System.out.println("Fue con exito");
 		}
 	}
 }

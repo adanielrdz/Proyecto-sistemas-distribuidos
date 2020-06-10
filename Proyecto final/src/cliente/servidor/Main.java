@@ -45,6 +45,7 @@ public class Main extends JFrame implements ActionListener
 		m.interfaz();
 		Cliente c=new Cliente();
 		c.interfazCliente().setVisible(true);
+		c.recibirDatos();
 		
 	}
 	

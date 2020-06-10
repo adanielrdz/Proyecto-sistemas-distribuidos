@@ -70,7 +70,6 @@ public class Cliente extends JFrame implements ActionListener
 	private String jose = "25.11.6.101";
 	private String ivan = "25.12.252.241";
 	private ServerSocket ss, ss2;
-	private boolean flagCargar;
 	/*
 	public static void main(String[]args) throws SigarException, IOException
 	{
@@ -82,6 +81,7 @@ public class Cliente extends JFrame implements ActionListener
 	public JTextField getTxtIp() {
 		return txtIPdestino;
 	}
+	
 	protected JFrame interfazCliente()
 	{
 		setTitle("SDP: Cliente");
@@ -274,9 +274,11 @@ public class Cliente extends JFrame implements ActionListener
 		String ramLibre= String.format(Locale.ROOT, "%.2f", division);
 		double disco = ((drive.getFreeSpace()/1073741824)*100)/(drive.getTotalSpace()/1073741824);
 		String discoLibre= String.format(Locale.ROOT, "%.2f", disco);
+		
 		//AGREGAMOS LOS DATOS AL CONSTRUCTOR
 		datos = new Datos(cliente, modeloProcesador,velocidadProcesador,so,ram,discoTotal,cpuLibre,ramLibre,discoLibre);
 		
+		txtUsuario.setEditable(false);
 		//Mostrar datos en 
 		txtSO.setText(datos.getSo().toString());
 		txtRAM.setText(datos.getRam().toString() + " GB");
@@ -286,12 +288,12 @@ public class Cliente extends JFrame implements ActionListener
 		txtCPUlibre.setText(datos.getCpuLibre().toString() + " %");
 		txtRAMlibre.setText(datos.getRamLibre().toString() + " %");
 		txtDDlibre.setText(datos.getDiscoLibre().toString() + " %");
+		
 		return datos;
 	}
 	
 	//METODO QUE ENVIA LOS DATOS POR EL SOCKET
-	protected void enviarDatos(String ip, int port) throws IOException, SigarException
-	{
+	protected void enviarDatos(String ip, int port) throws IOException, SigarException{
 		try{
 			//INSTANCIO EL SOCKET CON LA IP Y PUERTO
 			s=new Socket(ip,port);
@@ -301,121 +303,101 @@ public class Cliente extends JFrame implements ActionListener
 			System.out.println("Empaquetando datos...");
 			oos.writeObject(datos);
 			System.out.println("Datos enviados");
-		}catch(Exception ex){
-			//ex.printStackTrace();
-			//ESTE NO ES
-			System.out.println(ex.getMessage());
+		}catch(Exception e){
+			e.printStackTrace();
+			System.out.println("!Error: " + e.getMessage());
 		}
 	}
 	
 	//METODO QUE CIERRA LA CONEXION 
-	protected void cerrarConexion() throws IOException
-	{
+	protected void cerrarConexion() throws IOException{
 		if(oos != null)oos.close();
 		if(s!=null)s.close();
-		System.out.println("Conexion cerrada");
+		System.out.println("////Puerto de cliente cerrado///");
 	}
 
 	//METODO RECIBIR PUNTU
-	protected void recibirDatos()
-	{
+	protected void recibirDatos(){
 		ois2 = null;
 		s2 = null;
+		ss2 = null;
         try {
 			ss2 = new ServerSocket(4066);
+			System.out.println("////Puerto de cliente iniciado////");
 		} catch (IOException e1) {
 			e1.printStackTrace();
+			System.out.println("!Error: " + e1.getMessage());
 		}
 		Thread hilo = new Thread(new Runnable() {
            @Override
            public void run() {
-             while (true) 
-                {
-                  try 
-                   {
-                	Thread.sleep(3000);
-                    s2 = ss2.accept();
-                    ois2 = new ObjectInputStream(s2.getInputStream());
-                    
-                    // leo la ip enviada desde la difusion del nuevo servidor
-                    // y la asigno al text field para que se tome de ahÃ­ cuando se cree
-                    // un nuevo socket.
-                	txtIPdestino.setText((String)ois2.readObject());
-                   
-                	
-                    } catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} 
-                }
-            }
+        	   while (true){
+	             try {
+	            	 //Thread.sleep(3000);
+	            	 s2 = ss2.accept();
+	            	 ois2 = new ObjectInputStream(s2.getInputStream());
+	            	 //String str = (String)ois2.readObject();
+	            	 // leo la ip enviada desde la difusion del nuevo servidor
+	            	 // y la asigno al text field para que se tome de ahÃ­ cuando se cree
+	            	 // un nuevo socket.
+	            	 txtIPdestino.setText(ois2.readObject().toString());
+	            	 
+	             } catch (ClassNotFoundException | IOException /*| InterruptedException*/ e) {
+					e.printStackTrace();
+					System.out.println("!Error: " + e.getMessage());
+	             } 
+              }
+           }
         });
-		
         hilo.start();
 	}
 
 	//METODO PARA LAS ACCIONES DE LOS BOTONES
 	@Override
-	public void actionPerformed(ActionEvent e) 
-	{
+	public void actionPerformed(ActionEvent e){
 		if(e.getSource()==btnEmpezar) {
-			if(txtUsuario.getText().contentEquals("")) {
-				JOptionPane.showMessageDialog(null, "Ingrese un nombre para identificarse");
-			}else {
-				cliente = txtUsuario.getText().toString();
-				txtUsuario.setEditable(false);
-				if(!enviandoDatos)
-				{
-					if(parar) {
-						parar = false;
-					}
-					hilo=new Thread(new Runnable() {
-						@Override
-						public void run() 
-						{
-							// TODO Auto-generated method stub
-							while(!parar)
-							{
-								try {
-									enviarDatos(txtIPdestino.getText(),Integer.parseInt(txtPuerto.getText()));
-									obtenerDatos();
-									try {
-										Thread.sleep(5000);
-									}catch(InterruptedException e) {
-										e.printStackTrace();
-										System.out.println("Hilo interrumpido: " + e.getMessage());
-									}
-								} catch (IOException | NumberFormatException | SigarException e1){
-									e1.printStackTrace();
-									System.out.println("Excepción: " + e1.getMessage());
-								} 
-							}
-						}
-				
-					});
-					if(!parar) {
-						hilo.start();
-					}
-					enviandoDatos = true;
-					System.out.println("enviando datos...");
-					txtIPdestino.setEditable(false);
+			if(!enviandoDatos && !txtIPdestino.getText().isEmpty()){
+				if(parar) {
+					parar = false;
 				}
+				hilo=new Thread(new Runnable() {
+					@Override
+					public void run(){
+						while(!parar){
+							try {
+								enviarDatos(txtIPdestino.getText(),Integer.parseInt(txtPuerto.getText()));
+								obtenerDatos();
+								Thread.sleep(5000);
+							} catch (IOException | NumberFormatException | SigarException | InterruptedException e1){
+								e1.printStackTrace();
+								System.out.println("!Error: " + e1.getMessage());
+							} 
+						}
+					}
+			
+				});
+				if(!parar) {
+					hilo.start();
+				}
+				enviandoDatos = true;
+				System.out.println("enviando datos...");
+				txtIPdestino.setEditable(false);
+			}else {
+				JOptionPane.showMessageDialog(null, "Ingrese la dirección IP de destino");
 			}
 		}
 		
-		if(e.getSource()==btnCargar)
-		{
-			try {
-				obtenerDatos();
-			} catch (UnknownHostException | SigarException e1) {
-				e1.printStackTrace();
-				System.out.println("Exception: " + e1.getMessage());
+		if(e.getSource()==btnCargar){
+			if(txtUsuario.getText().isEmpty()) {
+				JOptionPane.showMessageDialog(null, "Ingrese un nombre para ser identificado");
+			}else {
+				cliente = txtUsuario.getText().toString();
+				try {
+					obtenerDatos();
+				} catch (UnknownHostException | SigarException e1) {
+					e1.printStackTrace();
+					System.out.println("!Error: " + e1.getMessage());
+				}
 			}
 		}
 		
@@ -426,9 +408,9 @@ public class Cliente extends JFrame implements ActionListener
 					try {
 						parar = true;
 						cerrarConexion();
-						System.out.println("Se cerró la conexión");
 					}catch(Exception e1) {
-						System.out.println("Exception: " + e1.getMessage());
+						e1.printStackTrace();
+						System.out.println("!Error: " + e1.getMessage());
 					}
 					enviandoDatos = false;
 				}
