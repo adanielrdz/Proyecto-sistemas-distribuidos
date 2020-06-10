@@ -57,8 +57,8 @@ public class Cliente extends JFrame implements ActionListener
 	private JTextField txtVelProcesador;
 	private JTextField txtUsuario;
 	private JButton btnCargar ,btnParar;
-	private JToggleButton btnEmpezar;
-	private Boolean detener=false;
+	private JButton btnEmpezar;
+	private Boolean activado=false;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private String ipLocal="25.24.184.239";	//IP propia de Hamachi
 	private String cliente = "Daniel";			//Nombre propio
@@ -225,43 +225,15 @@ public class Cliente extends JFrame implements ActionListener
 		btnParar.addActionListener(this);
 		panel_2.add(btnParar);
 		
-		btnEmpezar = new JToggleButton("Empezar");
+		btnEmpezar = new JButton("Empezar");
 		btnEmpezar.setBounds(370, 243, 89, 23);
-		btnEmpezar.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent itemEvent) 
-            {
-                while(btnEmpezar.isSelected())
-                {
-                	try {
-    					Thread.sleep(5000);
-    					try {
-    						enviarDatos(txtIPdestino.getText(),Integer.parseInt(txtPuerto.getText()));
-    					} catch (IOException e1) {
-    						e1.printStackTrace();
-    						System.out.println("IOException: " + e1.getMessage());
-    					} catch (NumberFormatException e1) {
-    						e1.printStackTrace();
-    						System.out.println("NumberFormatException: " + e1.getMessage());
-    					} catch (SigarException e1) {
-    						e1.printStackTrace();
-    						System.out.println("SigarException: " + e1.getMessage());
-    					}
- 
-    				} catch (InterruptedException e) {
-    					// TODO Auto-generated catch block
-    					e.printStackTrace();
-    				}
-                }
-                
-            }
-        });
+		btnEmpezar.addActionListener(this);
 		panel_2.add(btnEmpezar);
 		
 		txtIPusuario = new JLabel(ipLocal);
 		txtIPusuario.setBounds(352, 14, 103, 14);
 		panel_2.add(txtIPusuario);
-		
+		//
 		setVisible(true);
 		
 	}
@@ -316,11 +288,6 @@ public class Cliente extends JFrame implements ActionListener
 			//ex.printStackTrace();
 			System.out.println(ex.getMessage());
 		}
-		/*finally{
-			if(oos != null)oos.close();
-			if(s!=null)s.close();
-			System.out.println("Conexion cerrada");
-		*/
 	}
 	//METODO QUE CIERRA LA CONEXION 
 	protected void cerrarConexion() throws IOException
@@ -344,20 +311,34 @@ public class Cliente extends JFrame implements ActionListener
 	{
 		if(e.getSource()==btnEmpezar)
 		{
-			try {
-				enviarDatos(txtIPdestino.getText(),Integer.parseInt(txtPuerto.getText()));
-			} catch (IOException e1) {
-				e1.printStackTrace();
-				System.out.println("IOException: " + e1.getMessage());
-			} catch (NumberFormatException e1) {
-				e1.printStackTrace();
-				System.out.println("NumberFormatException: " + e1.getMessage());
-			} catch (SigarException e1) {
-				e1.printStackTrace();
-				System.out.println("SigarException: " + e1.getMessage());
-			}
-			
+			Thread hilo=new Thread(new Runnable() {
+
+				@Override
+				public void run() 
+				{
+					// TODO Auto-generated method stub
+					activado=true;
+					while(activado)
+					{
+						try {
+							enviarDatos(txtIPdestino.getText(),Integer.parseInt(txtPuerto.getText()));
+						} catch (IOException e1) {
+							e1.printStackTrace();
+							System.out.println("IOException: " + e1.getMessage());
+						} catch (NumberFormatException e1) {
+							e1.printStackTrace();
+							System.out.println("NumberFormatException: " + e1.getMessage());
+						} catch (SigarException e1) {
+							e1.printStackTrace();
+							System.out.println("SigarException: " + e1.getMessage());
+						}
+					}
+				}
+		
+			});
+			 hilo.start();
 		}
+		
 		if(e.getSource()==btnCargar)
 		{
 			try {
@@ -376,11 +357,20 @@ public class Cliente extends JFrame implements ActionListener
 			txtDDlibre.setText(datos.getDiscoLibre().toString() + " %");
 		}
 		if(e.getSource()==btnParar) {
-			try {
-				cerrarConexion();
-			}catch(Exception e1) {
-				System.out.println("Exception: " + e1.getMessage());
-			}
+			activado=false;
+			Thread hilo=new Thread(new Runnable() 
+			{
+				public void run() 
+				{
+					try 
+					{
+						cerrarConexion();
+					}catch(Exception e1) {
+					System.out.println("Exception: " + e1.getMessage());
+					}		
+				}
+				
+			});
 		}
 		
 	}
