@@ -2,6 +2,8 @@ package cliente.servidor;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,6 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
@@ -53,11 +56,12 @@ public class Cliente extends JFrame implements ActionListener
 	private JTextField txtCPUlibre;
 	private JTextField txtVelProcesador;
 	private JTextField txtUsuario;
-	private JButton btnCargar, btnEmpezar, btnParar;
-	
+	private JButton btnCargar ,btnParar;
+	private JToggleButton btnEmpezar;
+	private Boolean detener=false;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private String ipLocal="25.24.184.239";	//IP propia de Hamachi
-	private String cliente = "Cesar";			//Nombre propio
+	private String cliente = "Daniel";			//Nombre propio
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private boolean flagCargar;
 	
@@ -187,7 +191,7 @@ public class Cliente extends JFrame implements ActionListener
 		txtRAMlibre.setBounds(112, 42, 86, 20);
 		panelDatosDinamicos.add(txtRAMlibre);
 		txtRAMlibre.setColumns(10);
-		
+		;
 		txtCPUlibre = new JTextField();
 		txtCPUlibre.setEditable(false);
 		txtCPUlibre.setBounds(112, 11, 124, 20);
@@ -221,9 +225,37 @@ public class Cliente extends JFrame implements ActionListener
 		btnParar.addActionListener(this);
 		panel_2.add(btnParar);
 		
-		btnEmpezar = new JButton("Empezar");
+		btnEmpezar = new JToggleButton("Empezar");
 		btnEmpezar.setBounds(370, 243, 89, 23);
-		btnEmpezar.addActionListener(this);
+		btnEmpezar.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent itemEvent) 
+            {
+                while(btnEmpezar.isSelected())
+                {
+                	try {
+    					Thread.sleep(5000);
+    					try {
+    						enviarDatos(txtIPdestino.getText(),Integer.parseInt(txtPuerto.getText()));
+    					} catch (IOException e1) {
+    						e1.printStackTrace();
+    						System.out.println("IOException: " + e1.getMessage());
+    					} catch (NumberFormatException e1) {
+    						e1.printStackTrace();
+    						System.out.println("NumberFormatException: " + e1.getMessage());
+    					} catch (SigarException e1) {
+    						e1.printStackTrace();
+    						System.out.println("SigarException: " + e1.getMessage());
+    					}
+ 
+    				} catch (InterruptedException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
+                }
+                
+            }
+        });
 		panel_2.add(btnEmpezar);
 		
 		txtIPusuario = new JLabel(ipLocal);
@@ -284,16 +316,18 @@ public class Cliente extends JFrame implements ActionListener
 			//ex.printStackTrace();
 			System.out.println(ex.getMessage());
 		}
-		finally{
+		/*finally{
 			if(oos != null)oos.close();
 			if(s!=null)s.close();
 			System.out.println("Conexion cerrada");
-		}
+		*/
 	}
 	//METODO QUE CIERRA LA CONEXION 
-	protected void cerrarConexion()
+	protected void cerrarConexion() throws IOException
 	{
-		
+		if(oos != null)oos.close();
+		if(s!=null)s.close();
+		System.out.println("Conexion cerrada");
 	}
 
 	//METODO QUE ALAMACENA TODAS LAS DIRECCIONES IP	
