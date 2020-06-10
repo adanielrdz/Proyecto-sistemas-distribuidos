@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ public class Servidor extends JFrame implements ActionListener
 	private Socket s=null;
 	private ServerSocket ss;
 	//OBJETOS DEL JFRAME
+	private JFrame frameServidor;
 	private JPanel contentPane;
 	private JTable tablaDatos;
 	private JTable tablaRank;
@@ -56,17 +58,20 @@ public class Servidor extends JFrame implements ActionListener
 		"Daniel","Cesar","Erik","Jose","Ivan"
 	};
 	
-	private boolean clienteExiste;
+	int[] puntuaciones={danielPts,cesarPts,erikPts,josePts,ivanPts};
 	
-	public static void main(String[]args)
-	{
-		Servidor server=new Servidor();
-		server.interfazServidor();
-		
+	//private boolean clienteExiste;
+	public int[] getPuntuaciones() {
+		return puntuaciones;
 	}
+	HashMap<Integer,String> puntuacionesNombres = new HashMap<Integer,String>();
 	
+	public HashMap<Integer, String> getPuntuacionesNombres() {
+		return puntuacionesNombres;
+	}
+
 	//INTERFAZ DEL SERVER
-	protected void interfazServidor()
+	protected JFrame interfazServidor()
 	{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1216, 513);
@@ -117,12 +122,11 @@ public class Servidor extends JFrame implements ActionListener
 		lblRankeo.setBounds(552, 183, 98, 41);
 		contentPane.add(lblRankeo);
 		
-		setVisible(true);
-		
+		//setVisible(true);
 		
 		encabezadoTablas();
 		
-		
+		return this;
 	}
 	
 	//METODO PARA LEVANTAR LA CONEXION ENTRE EL CLIENTE Y SERVIDOR 
@@ -144,7 +148,7 @@ public class Servidor extends JFrame implements ActionListener
                 {
                   try 
                    {
-
+                	Thread.sleep(3000);
                     System.out.println("Esperando conexi�n entrante en el puerto " + String.valueOf(port) + "...");
                     s = ss.accept();
                     
@@ -157,6 +161,9 @@ public class Servidor extends JFrame implements ActionListener
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} 
@@ -332,8 +339,12 @@ public class Servidor extends JFrame implements ActionListener
 			ivanPts = algoritmoRankeo(datos);
 		}
 		
-		int[] puntuaciones = {danielPts,cesarPts,erikPts,josePts,ivanPts};
-		HashMap<Integer,String> puntuacionesNombres = new HashMap<Integer,String>();
+		puntuaciones[0]=danielPts;
+		puntuaciones[1]=cesarPts;
+		puntuaciones[2]=erikPts;
+		puntuaciones[3]=josePts;
+		puntuaciones[4]=ivanPts;
+	
 		
 		for(int i=0; i<5; i++) {
 			puntuacionesNombres.put(puntuaciones[i],nombres[i]);
@@ -357,6 +368,15 @@ public class Servidor extends JFrame implements ActionListener
 		*/
 	}
 	
+	//ENVIO DE ALERTA 
+	protected void enviarPuntuacion(String IpMejorRank) throws UnknownHostException, IOException
+	{
+		s=new Socket(daniel,4065);
+		
+		
+		
+		
+	}
 	
 	protected void encabezadoTablas()
 	{
@@ -369,7 +389,7 @@ public class Servidor extends JFrame implements ActionListener
 		modeloDatos.addColumn("CPU libre");
 		modeloDatos.addColumn("RAM libre");
 		modeloDatos.addColumn("Disco duro libre");
-		modeloRank.addColumn("Posici�n");
+		modeloRank.addColumn("Posicion");
 		modeloRank.addColumn("Clientes");
 		modeloRank.addColumn("Puntos");
 		
