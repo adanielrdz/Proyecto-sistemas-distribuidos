@@ -396,7 +396,26 @@ public class Servidor extends JFrame implements ActionListener
 	//ENVIO DE ALERTA 
 	protected void enviarAlerta(String IpMejorRank) throws UnknownHostException, IOException
 	{
-		s=new Socket(IpMejorRank,4066);
+		
+		
+		
+		try {
+			s=new Socket(IpMejorRank,4066);
+			ss = new ServerSocket(4066);
+			s = ss.accept();
+			
+			ObjectOutputStream oos2 = new ObjectOutputStream(s.getOutputStream());
+			oos2.writeObject(IpMejorRank);
+		} catch(Exception e) {
+			
+		} finally {
+			if(s != null) s.close();
+			if(ss != null) ss.close();
+		}
+		
+		
+		
+		
 		
 		
 		
