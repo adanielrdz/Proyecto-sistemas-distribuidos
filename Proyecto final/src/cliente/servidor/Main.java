@@ -25,6 +25,17 @@ public class Main extends JFrame implements ActionListener
 	
 	private Servidor server = null;
 	
+	
+	private String[] direcciones = {
+			"25.0.122.89",
+			"25.24.184.239",
+			"25.18.90.103",
+			"25.11.6.101",
+			"25.12.252.241"
+	};
+	
+	
+	
 	public static void main(String[]args)
 	{
 		Cliente c=new Cliente();
@@ -41,6 +52,9 @@ public class Main extends JFrame implements ActionListener
 		
 	}
 	
+	/*
+	 * Espera recibir la señal de que es el nuevo servidor
+	 */
 	public void recibirSenal() {
 		ois = null;
 		s = null;
@@ -55,14 +69,22 @@ public class Main extends JFrame implements ActionListener
           try 
            {
         	
+        	  // se ha recibido la alerta de que es el nuevo servidor (esta maquina)
             s = ss.accept();
             
-           
             ois = new ObjectInputStream(s.getInputStream());
+            String ip = (String)ois.readObject();
+            
+            // si esta maquina ya es el servidor, no hace nada
+            // si no, instancia el servidor y lo pone visible
             if(server == null) {
             	server = new Servidor();
             	server.interfazServidor().setVisible(true);
+            	
             }
+            
+            // le aviso a todos quien es el nuevo servidor
+            enviarDifusionIp(ip);
         	
             } catch (Exception e) {
             	
@@ -72,6 +94,23 @@ public class Main extends JFrame implements ActionListener
 		
 	}
 	
+	/* Este metodo envia a todos la nueva direccion */
+	private void enviarDifusionIp(String nuevaIpServidor) {
+		
+		// enviar 5 veces la direccion (son 5 hosts)
+		for(int i=0; i<5; i++) {
+			try{
+				s=new Socket(direcciones[i],4466);
+				oos = new ObjectOutputStream(s.getOutputStream());
+				oos.writeObject(nuevaIpServidor);
+			}catch(Exception ex){
+				System.out.println(ex.getMessage());
+			}
+		}
+	}
+	
+	
+	/*
 	private void enviarSenal(String ip, int port) {
 		try{
 			System.out.println("Antes de cargar el socket");
@@ -90,6 +129,7 @@ public class Main extends JFrame implements ActionListener
 			System.out.println(ex.getMessage());
 		}
 	}
+	*/
 	
 	//////
 	@Override
