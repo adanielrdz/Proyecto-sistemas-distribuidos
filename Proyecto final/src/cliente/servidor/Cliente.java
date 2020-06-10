@@ -15,11 +15,12 @@ import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-
+import java.util.Locale;
 import java.awt.Color;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
@@ -57,10 +58,11 @@ public class Cliente extends JFrame implements ActionListener
 	private JTextField txtUsuario;
 	private JButton btnCargar ,btnParar;
 	private JButton btnEmpezar;
-	private Boolean activado=false;
+	private Boolean parar=false, enviandoDatos = false;
+	private Thread hilo;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private String ipLocal="25.24.184.239";	//IP propia de Hamachi
-	private String cliente = "Daniel";			//Nombre propio
+	private String cliente;			//Nombre propio
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private String daniel = "25.0.122.89";
 	private String cesar = "25.24.184.239";
@@ -251,47 +253,53 @@ public class Cliente extends JFrame implements ActionListener
 	protected Datos obtenerDatos() throws SigarException, UnknownHostException
 	{
 		//INSTANCIAS DE OBJETOS DE LA LIBRERIA SIGAR
-		NumberFormat df = new DecimalFormat("#0.00");
-		NumberFormat velocidad = new DecimalFormat("#0.000");
 		Sigar sigar=new Sigar();
 		Mem mem=sigar.getMem();
 		CpuInfo cpu[]=sigar.getCpuInfoList();
 		CpuInfo info=cpu[0];
 		CpuPerc cpuPorcentaje=sigar.getCpuPerc();
 		File drive = new File("C:\\");
+		
 		//VALORES ESTATICOS
 		String modeloProcesador=info.getModel();
-		String velocidadProcesador=velocidad.format((double)info.getMhz()/1000);
+		Double vel = (double)info.getMhz()/1000;
+		String velocidadProcesador=String.format(Locale.ROOT, "%.3f", vel);
 		String so=System.getProperty("os.name");
 		String ram=(mem.getRam()/1000) + "";
-		double discoTotal=drive.getTotalSpace()/1073741824;
-		String disco= String.valueOf(discoTotal);
+		String discoTotal=String.format(Locale.ROOT, "%.2f", (double)drive.getTotalSpace()/1073741824);
+		
 		//VALORES DINAMICOS
-		String cpuLibre= df.format((100-cpuPorcentaje.getCombined()*100));//(100-cpuPorcentaje.getCombined()*100) + "";
-		double division = (((mem.getRam()-(mem.getActualUsed()/(1024*1024)))/1000)*100)/Double.parseDouble(ram);
-		String ramLibre= df.format(division);
-		String discoLibre= df.format(((drive.getFreeSpace()/1073741824)*100)/discoTotal);//(((drive.getFreeSpace()/1073741824)*100)/discoTotal) + "";
-	//	String puntos=String.valueOf(algoritmoRankeo(datos));
+		String cpuLibre= String.format(Locale.ROOT, "%.2f", 100-cpuPorcentaje.getCombined()*100);
+		double division = (((mem.getRam()-(mem.getActualUsed()/(1048576)))*100)/1000)/Double.parseDouble(ram);
+		String ramLibre= String.format(Locale.ROOT, "%.2f", division);
+		double disco = ((drive.getFreeSpace()/1073741824)*100)/(drive.getTotalSpace()/1073741824);
+		String discoLibre= String.format(Locale.ROOT, "%.2f", disco);
 		//AGREGAMOS LOS DATOS AL CONSTRUCTOR
-		datos = new Datos(cliente, modeloProcesador,velocidadProcesador,so,ram,disco,cpuLibre,ramLibre,discoLibre);
+		datos = new Datos(cliente, modeloProcesador,velocidadProcesador,so,ram,discoTotal,cpuLibre,ramLibre,discoLibre);
+		
+		//Mostrar datos en 
+		txtSO.setText(datos.getSo().toString());
+		txtRAM.setText(datos.getRam().toString() + " GB");
+		txtProcesador.setText(datos.getModeloProcesador().toString());
+		txtVelProcesador.setText(datos.getVelocidadProcesador().toString() + " GHz");
+		txtDD.setText(datos.getDisco().toString() + " GB");
+		txtCPUlibre.setText(datos.getCpuLibre().toString() + " %");
+		txtRAMlibre.setText(datos.getRamLibre().toString() + " %");
+		txtDDlibre.setText(datos.getDiscoLibre().toString() + " %");
 		return datos;
 	}
 	
 	//METODO QUE ENVIA LOS DATOS POR EL SOCKET
 	protected void enviarDatos(String ip, int port) throws IOException, SigarException
 	{
-		obtenerDatos();
-		System.out.println("Se entrï¿½ a: enviar datos");
 		try{
-			System.out.println("Antes de cargar el socket");
 			//INSTANCIO EL SOCKET CON LA IP Y PUERTO
 			s=new Socket(ip,port);
 			System.out.println("socket cargado");
 			oos = new ObjectOutputStream(s.getOutputStream());
 			////ENVIO DE DATOS AL SERVIDOR
-			System.out.println("Cargando...");
+			System.out.println("Empaquetando datos...");
 			oos.writeObject(datos);
-			System.out.println("Cargado...");
 			System.out.println("Datos enviados");
 		}catch(Exception ex){
 			//ex.printStackTrace();
@@ -354,34 +362,49 @@ public class Cliente extends JFrame implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e) 
 	{
-		if(e.getSource()==btnEmpezar)
-		{
-			Thread hilo=new Thread(new Runnable() {
-
-				@Override
-				public void run() 
+		if(e.getSource()==btnEmpezar) {
+			if(txtUsuario.getText().contentEquals("")) {
+				JOptionPane.showMessageDialog(null, "Ingrese un nombre para identificarse");
+			}else {
+				cliente = txtUsuario.getText().toString();
+				txtUsuario.setEditable(false);
+				if(!enviandoDatos)
 				{
-					// TODO Auto-generated method stub
-					activado=true;
-					while(activado)
-					{
-						try {
-							enviarDatos(txtIPdestino.getText(),Integer.parseInt(txtPuerto.getText()));
-						} catch (IOException e1) {
-							e1.printStackTrace();
-							System.out.println("IOException: " + e1.getMessage());
-						} catch (NumberFormatException e1) {
-							e1.printStackTrace();
-							System.out.println("NumberFormatException: " + e1.getMessage());
-						} catch (SigarException e1) {
-							e1.printStackTrace();
-							System.out.println("SigarException: " + e1.getMessage());
-						}
+					if(parar) {
+						parar = false;
 					}
+					hilo=new Thread(new Runnable() {
+						@Override
+						public void run() 
+						{
+							// TODO Auto-generated method stub
+							while(!parar)
+							{
+								try {
+									enviarDatos(txtIPdestino.getText(),Integer.parseInt(txtPuerto.getText()));
+									obtenerDatos();
+									try {
+										Thread.sleep(5000);
+									}catch(InterruptedException e) {
+										e.printStackTrace();
+										System.out.println("Hilo interrumpido: " + e.getMessage());
+									}
+								} catch (IOException | NumberFormatException | SigarException e1){
+									e1.printStackTrace();
+									System.out.println("Excepción: " + e1.getMessage());
+								} 
+							}
+						}
+				
+					});
+					if(!parar) {
+						hilo.start();
+					}
+					enviandoDatos = true;
+					System.out.println("enviando datos...");
+					txtIPdestino.setEditable(false);
 				}
-		
-			});
-			 hilo.start();
+			}
 		}
 		
 		if(e.getSource()==btnCargar)
@@ -392,30 +415,21 @@ public class Cliente extends JFrame implements ActionListener
 				e1.printStackTrace();
 				System.out.println("Exception: " + e1.getMessage());
 			}
-			txtSO.setText(datos.getSo().toString());
-			txtRAM.setText(datos.getRam().toString() + " GB");
-			txtProcesador.setText(datos.getModeloProcesador().toString());
-			txtVelProcesador.setText(datos.getVelocidadProcesador().toString() + " GHz");
-			txtDD.setText(datos.getDisco().toString() + " GB");
-			txtCPUlibre.setText(datos.getCpuLibre().toString() + " %");
-			txtRAMlibre.setText(datos.getRamLibre().toString() + " %");
-			txtDDlibre.setText(datos.getDiscoLibre().toString() + " %");
 		}
-		if(e.getSource()==btnParar) {
-			activado=false;
-			Thread hilo=new Thread(new Runnable() 
-			{
-				public void run() 
-				{
-					try 
-					{
-						cerrarConexion();
-					}catch(Exception e1) {
+		
+		if(e.getSource()==btnParar && !parar) {
+			if(enviandoDatos) {
+				System.out.println("Dejando de enviar datos...");
+				try {
+					parar = true;
+					cerrarConexion();
+					System.out.println("Se cerró la conexión");
+				}catch(Exception e1) {
 					System.out.println("Exception: " + e1.getMessage());
-					}		
 				}
-				
-			});
+				enviandoDatos = false;
+			}
+			
 		}
 		
 	}

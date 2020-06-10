@@ -27,10 +27,10 @@ import javax.swing.table.DefaultTableModel;
 public class Servidor extends JFrame implements ActionListener
 {
 	//4560
-	private ObjectInputStream ois=null;
-	private ObjectOutputStream oos=null;
-	private Socket s=null;
-	private ServerSocket ss;
+	private ObjectInputStream ois=null, ois2 = null;
+	private ObjectOutputStream oos=null, oos2 = null;
+	private Socket s=null, s2 = null;
+	private ServerSocket ss, ss2 = null;
 	//OBJETOS DEL JFRAME
 	private JFrame frameServidor;
 	private JPanel contentPane;
@@ -134,11 +134,12 @@ public class Servidor extends JFrame implements ActionListener
 	
 	protected void ejecutarConexion(int port)
 	{
-		ois = null;
-		oos = null;
-		s = null;
+		ois2 = null;
+		oos2 = null;
+		s2 = null;
+		ss2 = null;
         try {
-			ss = new ServerSocket(port);
+			ss2 = new ServerSocket(port);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -150,23 +151,26 @@ public class Servidor extends JFrame implements ActionListener
                   try 
                    {
                 	Thread.sleep(3000);
-                    System.out.println("Esperando conexiï¿½n entrante en el puerto " + String.valueOf(port) + "...");
-                    s = ss.accept();
+                    System.out.println("Esperando conexión entrante en el puerto " + String.valueOf(port) + "...");
+                    s2 = ss2.accept();
                     
-                    System.out.println("Conexiï¿½n establecida con: " + s.getInetAddress() + "\n\n\n");
-                    ois = new ObjectInputStream(s.getInputStream());
-                	Datos data = (Datos)ois.readObject();
-                	cargarDatos(data, s.getInetAddress().toString());    
+                    System.out.println("Conexión establecida con: " + s2.getInetAddress() + "\n\n\n");
+                    ois2 = new ObjectInputStream(s2.getInputStream());
+                	Datos data = (Datos)ois2.readObject();
+                	cargarDatos(data, s2.getInetAddress().toString());    
                 	
                     } catch (ClassNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						System.out.println("ClassNotFound: " + e.getMessage());
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						System.out.println("IOException: " + e.getMessage());
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						System.out.println("Interrupted: " + e.getMessage());
 					} 
                 }
             }
@@ -407,7 +411,7 @@ public class Servidor extends JFrame implements ActionListener
 			ObjectOutputStream oos2 = new ObjectOutputStream(s.getOutputStream());
 			oos2.writeObject(IpMejorRank);
 		} catch(Exception e) {
-			
+			System.out.println(e.getMessage());
 		} finally {
 			if(s != null) s.close();
 			if(ss != null) ss.close();
