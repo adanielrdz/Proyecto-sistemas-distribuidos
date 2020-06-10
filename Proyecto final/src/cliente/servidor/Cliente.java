@@ -337,7 +337,6 @@ public class Cliente extends JFrame implements ActionListener
 			txtProcesador.setText(datos.getModeloProcesador().toString());
 			txtVelProcesador.setText(datos.getVelocidadProcesador().toString() + " GHz");
 			txtDD.setText(datos.getDisco().toString() + " GB");
-			
 			txtCPUlibre.setText(datos.getCpuLibre().toString() + " %");
 			txtRAMlibre.setText(datos.getRamLibre().toString() + " %");
 			txtDDlibre.setText(datos.getDiscoLibre().toString() + " %");

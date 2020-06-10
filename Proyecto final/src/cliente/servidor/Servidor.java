@@ -29,11 +29,9 @@ public class Servidor extends JFrame implements ActionListener
 	private ServerSocket ss;
 	//OBJETOS DEL JFRAME
 	private JPanel contentPane;
-	private JTable tablaClientes;
 	private JTable tablaDatos;
 	private JTable tablaRank;
 	private DefaultTableModel modeloDatos=new DefaultTableModel();//MODELO DE LA TABLA DATOS
-	private DefaultTableModel modeloClientes=new DefaultTableModel();//MODELO DE LA TABLA CLIENTES
 	private DefaultTableModel modeloRank=new DefaultTableModel();
 	private JButton btnCerrar;
 	private JButton btnEjecutar;
@@ -68,10 +66,7 @@ public class Servidor extends JFrame implements ActionListener
 		btnEjecutar.setBounds(1015, 386, 164, 41);
 		btnEjecutar.addActionListener(this);
 		contentPane.add(btnEjecutar);
-		
-		tablaClientes = new JTable();
-		tablaClientes.setModel(modeloClientes);
-		contentPane.add(tablaClientes);
+	
 		
 		tablaDatos = new JTable();
 		tablaDatos.setModel(modeloDatos);
@@ -81,12 +76,8 @@ public class Servidor extends JFrame implements ActionListener
 		tablaRank.setModel(modeloRank);
 		contentPane.add(tablaRank);
 		
-		JScrollPane scrollClientes = new JScrollPane(tablaClientes);
-		scrollClientes .setBounds(15, 59, 164, 121);
-		contentPane.add(scrollClientes );
-		
 		JScrollPane scrollDatos = new JScrollPane(tablaDatos);
-		scrollDatos.setBounds(194, 59, 985, 121);
+		scrollDatos.setBounds(102, 59, 985, 121);
 		contentPane.add(scrollDatos);
 
 		JScrollPane scrollRank = new JScrollPane(tablaRank);
@@ -265,7 +256,7 @@ public class Servidor extends JFrame implements ActionListener
 		//en caso de que ya esté registrado, que sobrescriba los valores recibidos del cliente
 		
 		String nomCliente=datos.getUsuario();//Obtiene el usuario
-		String[] dataCliente = {nomCliente};
+		//String[] dataCliente = {nomCliente};
 		/*
 		for(int i = 0; i < dataCliente.length; i++) {
 			if(dataCliente[i].equals(nomCliente)) {
@@ -283,13 +274,10 @@ public class Servidor extends JFrame implements ActionListener
 		String cpuLibre=datos.getCpuLibre();
 		String ramLibre=datos.getRamLibre();
 		String discoLibre=datos.getDiscoLibre();
-		String[] data= {modeloProcesador,velocidadProcesador + " GHz",so,ram + " GB",disco + " GB",cpuLibre + " %",ramLibre + " %",discoLibre + " %"};
+		String[] data= {nomCliente,modeloProcesador,velocidadProcesador + " GHz",so,ram + " GB",disco + " GB",cpuLibre + " %",ramLibre + " %",discoLibre + " %"};
 		modeloDatos.addRow(data);
 		
 		
-		
-		
-		modeloClientes.addRow(dataCliente);
 		
 		/*
 		//TABLA Y MODEO DE RANKEO
@@ -301,6 +289,7 @@ public class Servidor extends JFrame implements ActionListener
 	
 	protected void encabezadoTablas()
 	{
+		modeloDatos.addColumn("Clientes");
 		modeloDatos.addColumn("Modelo del procesador");
 		modeloDatos.addColumn("Velocidad del procesador");
 		modeloDatos.addColumn("Sistema operativo");
@@ -309,11 +298,11 @@ public class Servidor extends JFrame implements ActionListener
 		modeloDatos.addColumn("CPU libre");
 		modeloDatos.addColumn("RAM libre");
 		modeloDatos.addColumn("Disco duro libre");
-		modeloClientes.addColumn("Clientes");
 		modeloRank.addColumn("Posición");
 		modeloRank.addColumn("Clientes");
 		modeloRank.addColumn("Puntos");
 	}
+
 	///METODO PARA CERRAR LA CONEXION 
 	protected void cerrarConexion()
 	{
