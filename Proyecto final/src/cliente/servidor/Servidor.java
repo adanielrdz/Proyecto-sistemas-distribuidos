@@ -65,6 +65,7 @@ public class Servidor extends JFrame implements ActionListener
 		return puntuaciones;
 	}
 	HashMap<Integer,String> puntuacionesNombres = new HashMap<Integer,String>();
+	HashMap<Integer,String> puntuacionesIp = new HashMap<Integer,String>();
 	
 	public HashMap<Integer, String> getPuntuacionesNombres() {
 		return puntuacionesNombres;
@@ -350,6 +351,20 @@ public class Servidor extends JFrame implements ActionListener
 			puntuacionesNombres.put(puntuaciones[i],nombres[i]);
 		}
 		
+		// hardcode direcciones ip nombres
+		/*
+		 * private String daniel = "/25.0.122.89";
+	private String cesar = "/25.24.184.239";
+	private String erik = "/25.18.90.103";
+	private String jose = "/25.11.6.101";
+	private String ivan = "/25.12.252.241";*/
+		
+		puntuacionesIp.put(danielPts,"25.0.122.89");
+		puntuacionesIp.put(cesarPts,"25.24.184.239");
+		puntuacionesIp.put(erikPts,"25.18.90.103");
+		puntuacionesIp.put(josePts,"25.11.6.101");
+		puntuacionesIp.put(ivanPts, "25.12.252.241");
+		
 		Arrays.sort(puntuaciones);
 		// ordenamos las puntuaciones
 		
@@ -359,7 +374,17 @@ public class Servidor extends JFrame implements ActionListener
 			modeloRank.setValueAt(i+1, i, 0);
 			
 			modeloRank.setValueAt(puntuacionesNombres.get(puntuaciones[4-i]), i, 1);
+			
 		}
+		
+		try {
+			enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 		/*
 		//TABLA Y MODEO DE RANKEO
 		String puntos=String.valueOf(algoritmoRankeo(datos));
@@ -369,9 +394,9 @@ public class Servidor extends JFrame implements ActionListener
 	}
 	
 	//ENVIO DE ALERTA 
-	protected void enviarPuntuacion(String IpMejorRank) throws UnknownHostException, IOException
+	protected void enviarAlerta(String IpMejorRank) throws UnknownHostException, IOException
 	{
-		s=new Socket(daniel,4065);
+		s=new Socket(IpMejorRank,4066);
 		
 		
 		
