@@ -1,5 +1,6 @@
 package cliente.servidor;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -10,22 +11,21 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 public class Main extends JFrame implements ActionListener
 {
-
+	private JPanel contentPane;
 	private Socket s;
 	private ServerSocket ss;
 	private ObjectInputStream ois;
-	
-	private ObjectOutputStream oos;
-	
+	private ObjectOutputStream oos;	
 	private Socket socket2;
-	
 	private Servidor server = null;
-	
-	
+	JButton btnEmpezar;
 	private String[] direcciones = {
 			"25.0.122.89",
 			"25.24.184.239",
@@ -38,16 +38,13 @@ public class Main extends JFrame implements ActionListener
 	
 	public static void main(String[]args)
 	{
-		Cliente c=new Cliente();
-		c.interfazCliente().setVisible(true);
+	//	Cliente c=new Cliente();
+	//	c.interfazCliente().setVisible(true);
+		
+		Main m=new Main();
+		m.interfaz();
 		
 		
-		Servidor server=new Servidor();
-		server.interfazServidor().setVisible(true);
-		
-		
-		Main m = new Main();
-		m.recibirSenal();
 		
 		
 	}
@@ -93,7 +90,18 @@ public class Main extends JFrame implements ActionListener
 		
 		
 	}
-	
+	private void interfaz()
+	{
+		setBounds(100, 100, 450, 300);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		setVisible(true);
+		btnEmpezar = new JButton("Empezar!!!");
+		btnEmpezar.addActionListener(this);
+		contentPane.add(btnEmpezar, BorderLayout.CENTER);
+	}
 	/* Este metodo envia a todos la nueva direccion */
 	private void enviarDifusionIp(String nuevaIpServidor) {
 		
@@ -135,7 +143,13 @@ public class Main extends JFrame implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent arg0) 
 	{
-		
+		if(arg0.getSource()==btnEmpezar)
+		{
+			Servidor server=new Servidor();
+			server.interfazServidor().setVisible(true);
+			Cliente cliente=new Cliente();
+			cliente.interfazCliente().setVisible(true);
+		}
 		
 	}
 	
