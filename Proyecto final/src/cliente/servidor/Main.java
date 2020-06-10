@@ -41,10 +41,10 @@ public class Main extends JFrame implements ActionListener
 		Cliente c=new Cliente();
 		c.interfazCliente().setVisible(true);
 		
-		/*/
+		
 		Servidor server=new Servidor();
 		server.interfazServidor().setVisible(true);
-		*/
+		
 		
 		Main m = new Main();
 		m.recibirSenal();
