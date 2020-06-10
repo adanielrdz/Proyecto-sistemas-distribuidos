@@ -43,9 +43,8 @@ public class Main extends JFrame implements ActionListener
 		
 		Main m=new Main();
 		m.interfaz();
-		
-		
-		
+		Cliente c=new Cliente();
+		c.interfazCliente().setVisible(true);
 		
 	}
 	
@@ -147,8 +146,6 @@ public class Main extends JFrame implements ActionListener
 		{
 			Servidor server=new Servidor();
 			server.interfazServidor().setVisible(true);
-			Cliente cliente=new Cliente();
-			cliente.interfazCliente().setVisible(true);
 		}
 		
 	}
