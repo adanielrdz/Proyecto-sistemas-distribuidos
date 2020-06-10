@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -50,6 +51,10 @@ public class Servidor extends JFrame implements ActionListener
 	private int erikPts = 0;
 	private int josePts = 0;
 	private int ivanPts = 0;
+	
+	private String[] nombres = {
+		"Daniel","Cesar","Erik","Jose","Ivan"
+	};
 	
 	private boolean clienteExiste;
 	
@@ -266,8 +271,9 @@ public class Servidor extends JFrame implements ActionListener
 	}
 	
 	//METODO PARA CARGAR EL MODELO DE LA TABLA Y QUE SEA DINAMICA
-	protected void cargarDatos(Datos datos, String ip)
+	protected void cargarDatos(Datos _datos, String ip)
 	{
+		Datos datos = _datos;
 		//Si el nombre de cliente ya est� registrado, no lo vuelva a agregar
 		//en caso de que ya est� registrado, que sobrescriba los valores recibidos del cliente
 		
@@ -280,6 +286,11 @@ public class Servidor extends JFrame implements ActionListener
 			}
 		}
 		*/
+		
+		
+		if(datos.getVelocidadProcesador().contains(",")) {
+			datos.setVelocidadProcesador(datos.getVelocidadProcesador().replace(",", "."));
+		}
 		
 		String modeloProcesador=datos.getModeloProcesador();
 		String velocidadProcesador=datos.getVelocidadProcesador();
@@ -322,12 +333,21 @@ public class Servidor extends JFrame implements ActionListener
 		}
 		
 		int[] puntuaciones = {danielPts,cesarPts,erikPts,josePts,ivanPts};
-		
-		// ordenamos las puntuaciones
-		Arrays.sort(puntuaciones);
+		HashMap<Integer,String> puntuacionesNombres = new HashMap<Integer,String>();
 		
 		for(int i=0; i<5; i++) {
-			modeloRank.setValueAt(puntuaciones[i], i, 2);
+			puntuacionesNombres.put(puntuaciones[i],nombres[i]);
+		}
+		
+		Arrays.sort(puntuaciones);
+		// ordenamos las puntuaciones
+		
+		for(int i=0; i<5; i++) {
+			modeloRank.setValueAt(puntuaciones[4-i], i, 2);
+			
+			modeloRank.setValueAt(i+1, i, 0);
+			
+			modeloRank.setValueAt(puntuacionesNombres.get(puntuaciones[4-i]), i, 1);
 		}
 		/*
 		//TABLA Y MODEO DE RANKEO
@@ -336,6 +356,7 @@ public class Servidor extends JFrame implements ActionListener
 		modeloRank.addRow(dataRank);
 		*/
 	}
+	
 	
 	protected void encabezadoTablas()
 	{
