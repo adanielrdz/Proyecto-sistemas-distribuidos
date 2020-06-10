@@ -9,6 +9,8 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import java.awt.Color;
@@ -35,7 +37,7 @@ public class Cliente extends JFrame implements ActionListener
 	//OBJETOS DE NETWOEKING
 	ObjectOutputStream oos;
 	ObjectInputStream ois;
-	Socket s=null;
+	Socket s = null;
 	//OBJETOS DE JFRAME
 
 	//OBJETOS DE JFRANE
@@ -52,6 +54,12 @@ public class Cliente extends JFrame implements ActionListener
 	private JTextField txtVelProcesador;
 	private JTextField txtUsuario;
 	private JButton btnCargar, btnEmpezar, btnParar;
+	
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private String ipLocal="25.24.184.239";	//IP propia de Hamachi
+	private String cliente = "Cesar";			//Nombre propio
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private boolean flagCargar;
 	
 	public static void main(String[]args) throws SigarException, IOException
 	{
@@ -218,7 +226,7 @@ public class Cliente extends JFrame implements ActionListener
 		btnEmpezar.addActionListener(this);
 		panel_2.add(btnEmpezar);
 		
-		txtIPusuario = new JLabel("localhost");
+		txtIPusuario = new JLabel(ipLocal);
 		txtIPusuario.setBounds(352, 14, 103, 14);
 		panel_2.add(txtIPusuario);
 		
@@ -229,30 +237,31 @@ public class Cliente extends JFrame implements ActionListener
 	//METODO QUE OBTIENE LOS DATOS
 	protected Datos obtenerDatos() throws SigarException, UnknownHostException
 	{
-			String usuario ="";//AQUI PONGAN SU NOMBRE 
-			//INSTANCIAS DE OBJETOS DE LA LIBRERIA SIGAR
-			Sigar sigar=new Sigar();
-			Mem mem=sigar.getMem();
-			CpuInfo cpu[]=sigar.getCpuInfoList();
-			CpuInfo info=cpu[0];
-			CpuPerc cpuPorcentaje=sigar.getCpuPerc();
-			File drive = new File("C:\\");
-			//VALORES ESTATICOS
-			String modeloProcesador=info.getModel();
-			String velocidadProcesador=info.getMhz()+"";
-			String so=System.getProperty("os.name");
-			String ram=(mem.getRam()/1000) + "";
-			double discoTotal=drive.getTotalSpace()/1073741824;
-			String disco=String.valueOf(discoTotal);
-			//VALORES DINAMICOS
-			String cpuLibre= (100-cpuPorcentaje.getCombined()*100) + "";
-			double division = (((mem.getRam()-(mem.getActualUsed()/(1024*1024)))/1000)*100)/Double.parseDouble(ram);
-			String ramLibre= division + "";
-			String discoLibre=(((drive.getFreeSpace()/1073741824)*100)/discoTotal) + "";
-		//	String puntos=String.valueOf(algoritmoRankeo(datos));
-			//AGREGAMOS LOS DATOS AL CONSTRUCTOR
-			datos = new Datos(usuario, modeloProcesador,velocidadProcesador,so,ram,disco,cpuLibre,ramLibre,discoLibre);
-			return datos;
+		//INSTANCIAS DE OBJETOS DE LA LIBRERIA SIGAR
+		NumberFormat df = new DecimalFormat("#0.00");
+		NumberFormat velocidad = new DecimalFormat("#0.000");
+		Sigar sigar=new Sigar();
+		Mem mem=sigar.getMem();
+		CpuInfo cpu[]=sigar.getCpuInfoList();
+		CpuInfo info=cpu[0];
+		CpuPerc cpuPorcentaje=sigar.getCpuPerc();
+		File drive = new File("C:\\");
+		//VALORES ESTATICOS
+		String modeloProcesador=info.getModel();
+		String velocidadProcesador=velocidad.format((double)info.getMhz()/1000);
+		String so=System.getProperty("os.name");
+		String ram=(mem.getRam()/1000) + "";
+		double discoTotal=drive.getTotalSpace()/1073741824;
+		String disco= String.valueOf(discoTotal);
+		//VALORES DINAMICOS
+		String cpuLibre= df.format((100-cpuPorcentaje.getCombined()*100));//(100-cpuPorcentaje.getCombined()*100) + "";
+		double division = (((mem.getRam()-(mem.getActualUsed()/(1024*1024)))/1000)*100)/Double.parseDouble(ram);
+		String ramLibre= df.format(division);
+		String discoLibre= df.format(((drive.getFreeSpace()/1073741824)*100)/discoTotal);//(((drive.getFreeSpace()/1073741824)*100)/discoTotal) + "";
+	//	String puntos=String.valueOf(algoritmoRankeo(datos));
+		//AGREGAMOS LOS DATOS AL CONSTRUCTOR
+		datos = new Datos(cliente, modeloProcesador,velocidadProcesador,so,ram,disco,cpuLibre,ramLibre,discoLibre);
+		return datos;
 	}
 	
 	//METODO QUE ENVIA LOS DATOS POR EL SOCKET
@@ -261,6 +270,7 @@ public class Cliente extends JFrame implements ActionListener
 		obtenerDatos();
 		System.out.println("Se entró a: enviar datos");
 		try{
+			System.out.println("Antes de cargar el socket");
 			//INSTANCIO EL SOCKET CON LA IP Y PUERTO
 			s=new Socket(ip,port);
 			System.out.println("socket cargado");
@@ -285,16 +295,15 @@ public class Cliente extends JFrame implements ActionListener
 	{
 		
 	}
-	
+
 	//METODO QUE ALAMACENA TODAS LAS DIRECCIONES IP	
 	protected ArrayList<String> direccionesIP()
 	{
 		direcciones=new ArrayList<String>();
-		String daniel="25.0.122.89";
-		direcciones.add(daniel);
+		direcciones.add(ipLocal);
 		return direcciones;
 	}
-		
+
 	//METODO PARA LAS ACCIONES DE LOS BOTONES
 	@Override
 	public void actionPerformed(ActionEvent e) 
@@ -304,15 +313,12 @@ public class Cliente extends JFrame implements ActionListener
 			try {
 				enviarDatos(txtIPdestino.getText(),Integer.parseInt(txtPuerto.getText()));
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				System.out.println("IOException: " + e1.getMessage());
 			} catch (NumberFormatException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				System.out.println("NumberFormatException: " + e1.getMessage());
 			} catch (SigarException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				System.out.println("SigarException: " + e1.getMessage());
 			}
@@ -323,20 +329,18 @@ public class Cliente extends JFrame implements ActionListener
 			try {
 				obtenerDatos();
 			} catch (UnknownHostException | SigarException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				System.out.println("Exception: " + e1.getMessage());
 			}
 			txtSO.setText(datos.getSo().toString());
-			txtRAM.setText(datos.getRam().toString() + "GB");
+			txtRAM.setText(datos.getRam().toString() + " GB");
 			txtProcesador.setText(datos.getModeloProcesador().toString());
-			txtVelProcesador.setText(datos.getVelocidadProcesador().toString() + "GHz");
-			txtDD.setText(datos.getDisco().toString() + "GB");
+			txtVelProcesador.setText(datos.getVelocidadProcesador().toString() + " GHz");
+			txtDD.setText(datos.getDisco().toString() + " GB");
 			
-			txtCPUlibre.setText(datos.getCpuLibre().toString());
-			txtRAMlibre.setText(datos.getRamLibre().toString());
-			txtDDlibre.setText(datos.getDiscoLibre().toString());
-			//lblDatos.setText(datos.toString());
+			txtCPUlibre.setText(datos.getCpuLibre().toString() + " %");
+			txtRAMlibre.setText(datos.getRamLibre().toString() + " %");
+			txtDDlibre.setText(datos.getDiscoLibre().toString() + " %");
 		}
 		if(e.getSource()==btnParar) {
 			try {

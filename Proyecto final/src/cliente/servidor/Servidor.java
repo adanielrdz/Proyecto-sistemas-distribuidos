@@ -27,7 +27,7 @@ public class Servidor extends JFrame implements ActionListener
 	private ObjectOutputStream oos=null;
 	private Socket s=null;
 	private ServerSocket ss;
-	//OBJETOS DEL JFRAME 
+	//OBJETOS DEL JFRAME
 	private JPanel contentPane;
 	private JTable tablaClientes;
 	private JTable tablaDatos;
@@ -38,6 +38,9 @@ public class Servidor extends JFrame implements ActionListener
 	private JButton btnCerrar;
 	private JButton btnEjecutar;
 	private JTextField txtPort;
+	
+	private boolean clienteExiste;
+	
 	public static void main(String[]args)
 	{
 		Servidor server=new Servidor();
@@ -50,7 +53,6 @@ public class Servidor extends JFrame implements ActionListener
 	{
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1216, 513);
-		setVisible(true);
 		setTitle("Servidor");
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -91,7 +93,7 @@ public class Servidor extends JFrame implements ActionListener
 		scrollRank.setBounds(209, 232, 824, 121);
 		contentPane.add(scrollRank);
 		
-		txtPort = new JTextField();
+		txtPort = new JTextField("4560");
 		txtPort.setBounds(80, 20, 146, 26);
 		contentPane.add(txtPort);
 		txtPort.setColumns(10);
@@ -104,6 +106,8 @@ public class Servidor extends JFrame implements ActionListener
 		lblRankeo.setFont(new Font("Tahoma", Font.PLAIN, 22));
 		lblRankeo.setBounds(552, 183, 98, 41);
 		contentPane.add(lblRankeo);
+		
+		setVisible(true);
 		
 		encabezadoTablas();
 		
@@ -120,11 +124,10 @@ public class Servidor extends JFrame implements ActionListener
         try {
 			ss = new ServerSocket(port);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		Thread hilo = new Thread(new Runnable() {
-            @Override
+           @Override
            public void run() {
              while (true) 
                 {
@@ -258,6 +261,19 @@ public class Servidor extends JFrame implements ActionListener
 	//METODO PARA CARGAR EL MODELO DE LA TABLA Y QUE SEA DINAMICA
 	protected void cargarDatos(Datos datos)
 	{
+		//Si el nombre de cliente ya está registrado, no lo vuelva a agregar
+		//en caso de que ya esté registrado, que sobrescriba los valores recibidos del cliente
+		
+		String nomCliente=datos.getUsuario();//Obtiene el usuario
+		String[] dataCliente = {nomCliente};
+		/*
+		for(int i = 0; i < dataCliente.length; i++) {
+			if(dataCliente[i].equals(nomCliente)) {
+				
+			}
+		}
+		*/
+		
 		String modeloProcesador=datos.getModeloProcesador();
 		String velocidadProcesador=datos.getVelocidadProcesador();
 		String so=datos.getSo();
@@ -267,11 +283,12 @@ public class Servidor extends JFrame implements ActionListener
 		String cpuLibre=datos.getCpuLibre();
 		String ramLibre=datos.getRamLibre();
 		String discoLibre=datos.getDiscoLibre();
-		String[] data= {modeloProcesador,velocidadProcesador,so,ram,disco,cpuLibre,ramLibre,discoLibre};
+		String[] data= {modeloProcesador,velocidadProcesador + " GHz",so,ram + " GB",disco + " GB",cpuLibre + " %",ramLibre + " %",discoLibre + " %"};
 		modeloDatos.addRow(data);
 		
-		String nomCliente=datos.getUsuario();
-		String[] dataCliente= {nomCliente};
+		
+		
+		
 		modeloClientes.addRow(dataCliente);
 		
 		/*
