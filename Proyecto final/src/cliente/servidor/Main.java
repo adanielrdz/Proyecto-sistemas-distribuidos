@@ -23,13 +23,17 @@ public class Main extends JFrame implements ActionListener
 	
 	private Socket socket2;
 	
+	private Servidor server = null;
+	
 	public static void main(String[]args)
 	{
 		Cliente c=new Cliente();
 		c.interfazCliente().setVisible(true);
 		
+		/*/
 		Servidor server=new Servidor();
 		server.interfazServidor().setVisible(true);
+		*/
 		
 		Main m = new Main();
 		m.recibirSenal();
@@ -55,8 +59,11 @@ public class Main extends JFrame implements ActionListener
             
            
             ois = new ObjectInputStream(s.getInputStream());
-            ipMasAlto = (String)ois.readObject();
-        	enviarSenal(ipMasAlto, 4066);
+            if(server == null) {
+            	server = new Servidor();
+            	server.interfazServidor().setVisible(true);
+            }
+        	
             } catch (Exception e) {
             	
             }
