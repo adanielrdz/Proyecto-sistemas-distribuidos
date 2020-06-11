@@ -322,7 +322,7 @@ public class Cliente extends JFrame implements ActionListener
 		s2 = null;
 		ss2 = null;
         try {
-			ss2 = new ServerSocket(4066);
+        	ss2 = new ServerSocket(4066);
 			System.out.println("////Puerto de cliente iniciado////");
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -356,34 +356,36 @@ public class Cliente extends JFrame implements ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e){
 		if(e.getSource()==btnEmpezar) {
-			if(!enviandoDatos && !txtIPdestino.getText().isEmpty()){
-				if(parar) {
-					parar = false;
-				}
-				hilo=new Thread(new Runnable() {
-					@Override
-					public void run(){
-						while(!parar){
-							try {
-								enviarDatos(txtIPdestino.getText(),Integer.parseInt(txtPuerto.getText()));
-								obtenerDatos();
-								Thread.sleep(5000);
-							} catch (IOException | NumberFormatException | SigarException | InterruptedException e1){
-								e1.printStackTrace();
-								System.out.println("!Error: " + e1.getMessage());
-							} 
-						}
-					}
-			
-				});
-				if(!parar) {
-					hilo.start();
-				}
-				enviandoDatos = true;
-				System.out.println("enviando datos...");
-				txtIPdestino.setEditable(false);
-			}else {
+			if(txtIPdestino.getText().isEmpty()) {
 				JOptionPane.showMessageDialog(null, "Ingrese la dirección IP de destino");
+			}else {
+				if(!enviandoDatos){
+					if(parar) {
+						parar = false;
+					}
+					hilo=new Thread(new Runnable() {
+						@Override
+						public void run(){
+							while(!parar){
+								try {
+									enviarDatos(txtIPdestino.getText().toString(),Integer.parseInt(txtPuerto.getText()));
+									obtenerDatos();
+									Thread.sleep(5000);
+								} catch (IOException | NumberFormatException | SigarException | InterruptedException e1){
+									e1.printStackTrace();
+									System.out.println("!Error: " + e1.getMessage());
+								} 
+							}
+						}
+				
+					});
+					if(!parar) {
+						hilo.start();
+					}
+					enviandoDatos = true;
+					System.out.println("enviando datos...");
+					txtIPdestino.setEditable(false);
+				}
 			}
 		}
 		

@@ -56,6 +56,14 @@ public class Servidor extends JFrame implements ActionListener
 	private int josePts = 0;
 	private int ivanPts = 0;
 	
+	private String[] direcciones = {
+			"25.0.122.89",
+			"25.24.184.239",
+			"25.18.90.103",
+			"25.11.6.101",
+			"25.12.252.241"
+	};
+	
 	private String[] nombres = {
 		"Daniel","Cesar","Erik","Jose","Ivan"
 	};
@@ -66,6 +74,7 @@ public class Servidor extends JFrame implements ActionListener
 	public int[] getPuntuaciones() {
 		return puntuaciones;
 	}
+	
 	HashMap<Integer,String> puntuacionesNombres = new HashMap<Integer,String>();
 	HashMap<Integer,String> puntuacionesIp = new HashMap<Integer,String>();
 	
@@ -375,7 +384,6 @@ public class Servidor extends JFrame implements ActionListener
 			System.out.println("!Error: " + e.getMessage());
 		}
 		
-		
 		/*
 		//TABLA Y MODEO DE RANKEO
 		String puntos=String.valueOf(algoritmoRankeo(datos));
@@ -387,22 +395,22 @@ public class Servidor extends JFrame implements ActionListener
 	//ENVIO DE ALERTA 
 	protected void enviarAlerta(String IpMejorRank) throws UnknownHostException, IOException
 	{
-		try {
-			System.out.println("Convertir en servidor la ip: " + IpMejorRank);
-			s2 = new Socket(IpMejorRank,4066);
-			System.out.println("nuevo socket cargado");
-			//ss2 = new ServerSocket(4066);
-			//s2 = ss2.accept();
-			oos2 = new ObjectOutputStream(s2.getOutputStream());
-			oos2.writeObject(IpMejorRank);
-		} catch(Exception e) {
-			//Excepción de "Connection refused: connect"
-			e.getStackTrace();
-			System.out.println("!Error: " + e.getMessage());
-		} finally {
-			if(s2 != null) s2.close();
-			if(ss2 != null) ss2.close();
-			if(oos2 != null) oos2.close();
+		System.out.println("Convertir en servidor la ip: " + IpMejorRank);
+		for(int i = 0; i < direcciones.length; i++) {
+			try {
+				s2 = new Socket(direcciones[i],4066);
+				System.out.println("nuevo socket cargado para la ip: " + direcciones[i]);
+				oos2 = new ObjectOutputStream(s2.getOutputStream());
+				oos2.writeObject(IpMejorRank);
+			} catch(Exception e) {
+				//Excepción de "Connection refused: connect"
+				e.getStackTrace();
+				System.out.println("!Error: " + e.getMessage());
+			} finally {
+				if(s2 != null) s2.close();
+				if(ss2 != null) ss2.close();
+				if(oos2 != null) oos2.close();
+			}
 		}
 		
 	}

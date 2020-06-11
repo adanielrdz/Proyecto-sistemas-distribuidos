@@ -19,10 +19,10 @@ import javax.swing.border.EmptyBorder;
 public class Main extends JFrame implements ActionListener
 {
 	private JPanel contentPane;
-	private Socket s;
-	private ServerSocket ss;
-	private ObjectInputStream ois;
-	private ObjectOutputStream oos;	
+	private Socket s, s2;
+	private ServerSocket ss, ss2;
+	private ObjectInputStream ois, ois2;
+	private ObjectOutputStream oos, oos2;	
 	private Socket socket2;
 	private Servidor server = null;
 	JButton btnEmpezar;
@@ -33,8 +33,6 @@ public class Main extends JFrame implements ActionListener
 			"25.11.6.101",
 			"25.12.252.241"
 	};
-	
-	
 	
 	public static void main(String[]args)
 	{
@@ -61,11 +59,8 @@ public class Main extends JFrame implements ActionListener
 			e1.printStackTrace();
 		}
 		String ipMasAlto;
-		while (true) 
-        {
-          try 
-           {
-        	
+		while (true) {
+          try {
         	  // se ha recibido la alerta de que es el nuevo servidor (esta maquina)
             s = ss.accept();
             
@@ -102,15 +97,15 @@ public class Main extends JFrame implements ActionListener
 		contentPane.add(btnEmpezar, BorderLayout.CENTER);
 		setVisible(true);
 	}
+	
 	/* Este metodo envia a todos la nueva direccion */
 	private void enviarDifusionIp(String nuevaIpServidor) {
-		
 		// enviar 5 veces la direccion (son 5 hosts)
 		for(int i=0; i<5; i++) {
 			try{
-				s=new Socket(direcciones[i],4466);
-				oos = new ObjectOutputStream(s.getOutputStream());
-				oos.writeObject(nuevaIpServidor);
+				s2 = new Socket(direcciones[i],4066);
+				oos2 = new ObjectOutputStream(s2.getOutputStream());
+				oos2.writeObject(nuevaIpServidor);
 			}catch(Exception ex){
 				System.out.println(ex.getMessage());
 			}
