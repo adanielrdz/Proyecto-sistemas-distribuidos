@@ -3,6 +3,7 @@ package cliente.servidor;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -27,12 +28,10 @@ public class Main extends JFrame implements ActionListener
 	private JPanel contentPane;
 	private Socket s, s2;
 	private ServerSocket ss, ss2;
-	private ObjectInputStream ois, ois2;
-	private ObjectOutputStream oos, oos2;	
-	private Socket socket2;
+	private DataInputStream entrada;	
 	private Servidor server = null;
 	JButton btnEmpezar;
-	Cliente cliente=new Cliente();
+	static Main main;
 	private String[] direcciones = {
 			"25.0.122.89",
 			"25.24.184.239",
@@ -43,26 +42,20 @@ public class Main extends JFrame implements ActionListener
 	
 		public static void main(String[]args) throws ClassNotFoundException, IOException, InterruptedException
 	{
-	//	Cliente c=new Cliente();
-	//	c.interfazCliente().setVisible(true);	
-		Main m=new Main();
-		m.interfaz();
-		m.inicializarCliente();
-		m.recibirSenal();
+		Cliente c=new Cliente();
+		c.interfazCliente().setVisible(true);	
+		main=new Main();
+		main.interfaz().setVisible(true);;
+		main.recibirSenal();
 	}
 	
-	public void inicializarCliente()
-	{
-		cliente.interfazCliente().setVisible(true);
-	}
-	/*
-	 * Espera recibir la señal de que es el nuevo servidor
-	 */
+	
 	public void recibirSenal() throws IOException, ClassNotFoundException, InterruptedException {
-		ois = null;
+		entrada = null;
 		s = null;
+		ss=null;
         try {
-			ss = new ServerSocket(4070);
+			ss = new ServerSocket(5000);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -72,15 +65,14 @@ public class Main extends JFrame implements ActionListener
           {
         	  // se ha recibido la alerta de que es el nuevo servidor (esta maquina)
             s = ss.accept();
-            
-            ois = new ObjectInputStream(s.getInputStream());
-            String ip = (String)ois.readObject();
+            entrada = new DataInputStream(s.getInputStream());
+            String ip = entrada.readUTF();
             // si esta maquina ya es el servidor, no hace nada
             // si no, instancia el servidor y lo pone visible
-            Thread.sleep(5000);
             String iplocal=obtenerIPLocal();
           	if(iplocal.equals(ip))
           	{
+          		System.out.println("Tu eres el que tiene el mejor rank");
           		if(server == null) 
           		{
                 	server = new Servidor();
@@ -96,6 +88,7 @@ public class Main extends JFrame implements ActionListener
             //enviarDifusionIp(ip);
             } 
       }
+      
 	//OBTIENE DIRECCION IP
 	protected String obtenerIPLocal()
 	{
@@ -131,7 +124,7 @@ public class Main extends JFrame implements ActionListener
 		return direccionIP;
 	}
 	
-	private void interfaz()
+	private JFrame interfaz()
 	{
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -141,7 +134,7 @@ public class Main extends JFrame implements ActionListener
 		btnEmpezar = new JButton("Empezar!!!");
 		btnEmpezar.addActionListener(this);
 		contentPane.add(btnEmpezar, BorderLayout.CENTER);
-		setVisible(true);
+		return this;
 	}
 	
 	/*
@@ -189,6 +182,7 @@ public class Main extends JFrame implements ActionListener
 		{
 			Servidor server=new Servidor();
 			server.interfazServidor().setVisible(true);
+			main.interfaz().setVisible(false);
 		}
 		
 	}

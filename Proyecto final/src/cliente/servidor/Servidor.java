@@ -3,6 +3,8 @@ package cliente.servidor;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,8 +30,9 @@ public class Servidor extends JFrame implements ActionListener
 {
 	/*by danie*/
 	//4560
-	private ObjectInputStream ois=null, ois2 = null;
-	private ObjectOutputStream oos=null, oos2 = null;
+	private ObjectInputStream ois=null;
+	private ObjectOutputStream oos=null;
+	private DataOutputStream salida=null;
 	private Socket s=null, s2 = null;
 	private ServerSocket ss, ss2 = null;
 	//OBJETOS DEL JFRAME
@@ -161,11 +164,11 @@ public class Servidor extends JFrame implements ActionListener
                   try {
                 	
                     s = ss.accept();
-                    System.out.println("Conexiï¿½n establecida con: " + s.getInetAddress() + "\n");
+                    System.out.println("Conexión establecida con: " + s.getInetAddress() + "\n");
                     ois = new ObjectInputStream(s.getInputStream());
                 	Datos data = (Datos)ois.readObject();
-                	cargarDatos(data, s.getInetAddress().toString());
-                	enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
+                	cargarDatos(data, s.getInetAddress().toString()); 
+                	System.out.println("Se cargaron los datos");
                 	//Thread.sleep(5000);
                     } catch (ClassNotFoundException | IOException /*| InterruptedException*/ e) {
 						e.printStackTrace();
@@ -183,31 +186,31 @@ public class Servidor extends JFrame implements ActionListener
 		int pts=0;
 		// serie de cpu intel y AMD (mejorable)
 		if(datos.getModeloProcesador().contains("i7")) {
-			pts+=600;
+			pts+=1000;
 		} else if(datos.getModeloProcesador().contains("i5")) {
-			pts+=500;
+			pts+=800;
 		} else if(datos.getModeloProcesador().contains("i3")) {
-			pts+=400;
+			pts+=600;
 		} else if(datos.getModeloProcesador().contains("Pentium")) {
-			pts+=300;
+			pts+=400;
 		} else if(datos.getModeloProcesador().contains("Celeron")) {
-			pts+=100;
-		} else if(datos.getModeloProcesador().contains("A8")) {
 			pts+=200;
+		} else if(datos.getModeloProcesador().contains("A8")) {
+			pts+=300;
 		}
 		
 		// velocidad de cpu
 		double cpufreq = Double.parseDouble(datos.getVelocidadProcesador());
 		if(cpufreq >= 3200) {
-			pts+=600;
+			pts+=1100;
 		}else if(cpufreq < 3200 && cpufreq >= 2400) {
-			pts+=500;
+			pts+=900;
 		} else if(cpufreq < 2400 && cpufreq >= 1900) {
-			pts+=400;
+			pts+=700;
 		} else if(cpufreq < 1900 && cpufreq >= 1400) {
-			pts=300;
+			pts=500;
 		}else {
-			pts+=150;
+			pts+=200;
 		}
 		
 		// RAM total
@@ -247,7 +250,7 @@ public class Servidor extends JFrame implements ActionListener
 		// RAM libre %
 		double ramLibre =Double.parseDouble(datos.getRamLibre());
 		if(ramLibre >= 90) {
-			pts+=1500;
+			pts+=1400;
 		} else if(ramLibre < 90 && ramLibre >= 80) {
 			pts+=1250;
 		} else if(ramLibre < 80 && ramLibre >= 70) {
@@ -263,17 +266,17 @@ public class Servidor extends JFrame implements ActionListener
 		// disco libre %
 		double discoLibre = Double.parseDouble(datos.getDiscoLibre());
 		if(discoLibre >= 90) {
-			pts+=700;
+			pts+=1400;
 		} else if(discoLibre < 90 && discoLibre >= 80) {
-			pts+=600;
+			pts+=1250;
 		} else if(discoLibre < 80 && discoLibre >= 70) {
-			pts+=500;
+			pts+=950;
 		} else if(discoLibre < 70 && discoLibre >= 60) {
-			pts+=400;
+			pts+=700;
 		} else if(discoLibre < 60 && discoLibre >= 50) {
-			pts+=300;
+			pts+=550;
 		} else {
-			pts+=200;
+			pts+=300;
 		}
 		
 		return pts; 
@@ -379,8 +382,13 @@ public class Servidor extends JFrame implements ActionListener
 			
 		}
 		
-		
-		/*
+		try {
+			enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("!Error al enviar alerta!2: " + e.getMessage());
+		}
+		/*	
 		//TABLA Y MODEO DE RANKEO
 		String puntos=String.valueOf(algoritmoRankeo(datos));
 		String[] dataRank= {puntos};
@@ -388,30 +396,30 @@ public class Servidor extends JFrame implements ActionListener
 		*/
 	}
 	
-	//ENVIO DE ALERTA 
+	
 	protected void enviarAlerta(String IpMejorRank) throws UnknownHostException, IOException
 	{
 		System.out.println("Convertir en servidor la ip: " + IpMejorRank);
 		for(int i = 0; i < direcciones.length; i++) {
 			try {
-				s2 = new Socket(direcciones[i],4070);
+				s2 = new Socket(direcciones[i],5000);
 				System.out.println("nuevo socket cargado para la ip: " + direcciones[i]);
-				oos2 = new ObjectOutputStream(s2.getOutputStream());
-				oos2.writeObject(IpMejorRank);
+				salida = new DataOutputStream(s2.getOutputStream());
+				salida.writeUTF(IpMejorRank);
+				System.out.println("Se enviaron");
 			} catch(Exception e) {
-				//Excepciï¿½n de "Connection refused: connect"
+				//Excepción de "Connection refused: connect"
 				e.getStackTrace();
-				System.out.println("!Error: " + e.getMessage());
+				System.out.println("!Error en enviar alerta! : " + e.getMessage());
 			} finally {
 				if(s2 != null) s2.close();
 				if(ss2 != null) ss2.close();
-				if(oos2 != null) oos2.close();
+				if(salida != null) salida.close();
 			}
 		}
 		
-		
 	}
-	
+
 	protected void encabezadoTablas()
 	{
 		//Agregar encabezado de las tablas
@@ -475,8 +483,9 @@ public class Servidor extends JFrame implements ActionListener
 				ejecutarConexion(Integer.parseInt(txtPort.getText()));
 				serverIniciado = true;
 				txtPort.setEditable(false);
+				
 			}else {
-				JOptionPane.showMessageDialog(null, "Ingrese un puerto para levantar conexiï¿½n");
+				JOptionPane.showMessageDialog(null, "Ingrese un puerto para levantar conexión");
 			}
 			
 		}

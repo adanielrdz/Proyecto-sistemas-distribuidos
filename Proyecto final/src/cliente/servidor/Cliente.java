@@ -293,7 +293,6 @@ public class Cliente extends JFrame implements ActionListener
 		txtCPUlibre.setText(datos.getCpuLibre().toString() + " %");
 		txtRAMlibre.setText(datos.getRamLibre().toString() + " %");
 		txtDDlibre.setText(datos.getDiscoLibre().toString() + " %");
-		
 		return datos;
 	}
 	
@@ -302,10 +301,10 @@ public class Cliente extends JFrame implements ActionListener
 		try{
 			//INSTANCIO EL SOCKET CON LA IP Y PUERTO
 			s=new Socket(ip,port);
-			System.out.println("socket cargado");
+		//	System.out.println("socket cargado");
 			oos = new ObjectOutputStream(s.getOutputStream());
 			////ENVIO DE DATOS AL SERVIDOR
-			System.out.println("Empaquetando datos...");
+		//	System.out.println("Empaquetando datos...");
 			oos.writeObject(datos);
 			System.out.println("Datos enviados");
 		}catch(Exception e){
@@ -321,7 +320,7 @@ public class Cliente extends JFrame implements ActionListener
 		System.out.println("////Puerto de cliente cerrado///");
 	}
 
-	//METODO RECIBIR PUNTU
+	/*
 	protected void recibirDatos(){
 		ois2 = null;
 		s2 = null;
@@ -347,7 +346,7 @@ public class Cliente extends JFrame implements ActionListener
 	            	 // un nuevo socket.
 	            	 txtIPdestino.setText(ois2.readObject().toString());
 	            	 System.out.println("IP mejor rankeada: "+ois2.readObject().toString());
-	             } catch (ClassNotFoundException | IOException /*| InterruptedException*/ e) {
+	             } catch (ClassNotFoundException | IOException /*| InterruptedException e) {
 					e.printStackTrace();
 					System.out.println("!Error: " + e.getMessage());
 	             } 
@@ -356,7 +355,7 @@ public class Cliente extends JFrame implements ActionListener
         });
         hilo.start();
 	}
-	
+	*/
 
 	//METODO PARA LAS ACCIONES DE LOS BOTONES
 	@Override
