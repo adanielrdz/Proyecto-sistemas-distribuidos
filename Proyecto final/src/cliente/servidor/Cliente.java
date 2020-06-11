@@ -250,6 +250,8 @@ public class Cliente extends JFrame implements ActionListener
 		panel_2.add(txtIPusuario);
 		//
 		//setVisible(true);
+		
+		recibirDatos();
 		return this;
 		
 	}
@@ -321,16 +323,17 @@ public class Cliente extends JFrame implements ActionListener
 	}
 
 	
+	// recibe la alerta de quien es el nuevo servidor
 	protected void recibirDatos(){
 		ois2 = null;
 		s2 = null;
 		ss2 = null;
         try {
         	ss2 = new ServerSocket(5000);
-			System.out.println("////Puerto de cliente iniciado////");
+			System.out.println("Cliente -> ////Puerto recibir alerta de servidor iniciado ////");
 		} catch (IOException e1) {
 			e1.printStackTrace();
-			System.out.println("!Error: " + e1.getMessage());
+			System.out.println("Cliente -> !Error al inicializar socket: " + e1.getMessage());
 		}
 		Thread hilo = new Thread(new Runnable() {
            @Override
@@ -345,7 +348,7 @@ public class Cliente extends JFrame implements ActionListener
 	            	 // y la asigno al text field para que se tome de ahí cuando se cree
 	            	 // un nuevo socket.
 	            	 txtIPdestino.setText(ois2.readObject().toString());
-	            	 System.out.println("IP mejor rankeada: "+ois2.readObject().toString());
+	            	 System.out.println("Cliente -> La IP mejor rankeada es: "  +ois2.readObject().toString());
 	             } catch (ClassNotFoundException | IOException  e) {
 					e.printStackTrace();
 					System.out.println("!Error: " + e.getMessage());
@@ -387,7 +390,7 @@ public class Cliente extends JFrame implements ActionListener
 						hilo.start();
 					}
 					enviandoDatos = true;
-					System.out.println("enviando datos...");
+					System.out.println("Cliente -> enviando datos a servidor...");
 					txtIPdestino.setEditable(false);
 				}
 			}
@@ -410,7 +413,7 @@ public class Cliente extends JFrame implements ActionListener
 		if(e.getSource()==btnParar) {
 			if(!parar) {
 				if(enviandoDatos) {
-					System.out.println("Dejando de enviar datos...");
+					System.out.println("Cliente -> Dejando de enviar datos...");
 					try {
 						parar = true;
 						cerrarConexion();

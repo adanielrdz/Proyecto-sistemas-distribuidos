@@ -148,7 +148,7 @@ public class Servidor extends JFrame implements ActionListener
 	//METODO PARA LEVANTAR LA CONEXION ENTRE EL CLIENTE Y SERVIDOR 
 	protected void ejecutarConexion(int port){
 		ois = null;
-		oos = null;
+		
 		s = null;
 		ss = null;
         try {
@@ -173,8 +173,27 @@ public class Servidor extends JFrame implements ActionListener
                     } catch (ClassNotFoundException | IOException /*| InterruptedException*/ e) {
 						e.printStackTrace();
 						System.out.println("!Error: " + e.getMessage());
+					} finally {
+						if (s != null) {
+			            	 try {
+								s.close();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+			             }
+						if(ois != null) {
+							try {
+								ois.close();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
 					}
+                  
                 }
+             
             }
         });
         hilo.start();
@@ -386,7 +405,7 @@ public class Servidor extends JFrame implements ActionListener
 			enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("!Error al enviar alerta!2: " + e.getMessage());
+			System.out.println("Servidor -> !Error al enviar alerta!: " + e.getMessage());
 		}
 		/*	
 		//TABLA Y MODEO DE RANKEO
@@ -431,7 +450,6 @@ public class Servidor extends JFrame implements ActionListener
 				System.out.println("Servidor -> !Error en enviar alerta a " + direcciones[i] + "! : " + e.getMessage());
 			}
 			if(s2 != null) s2.close();
-			if(ss2 != null) ss2.close();
 			if(salida != null) salida.close();
 		}
 		

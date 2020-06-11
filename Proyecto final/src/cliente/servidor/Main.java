@@ -28,7 +28,7 @@ public class Main extends JFrame implements ActionListener
 	private JPanel contentPane;
 	private Socket s, s2;
 	private ServerSocket ss, ss2;
-	private DataInputStream entrada;	
+	private ObjectInputStream entrada;	
 	private Servidor server = null;
 	JButton btnEmpezar;
 	static Main main;
@@ -65,16 +65,17 @@ public class Main extends JFrame implements ActionListener
           {
         	  // se ha recibido la alerta de que es el nuevo servidor (esta maquina)
             s = ss.accept();
-            entrada = new DataInputStream(s.getInputStream());
-            String ip = entrada.readUTF();
+            entrada = new ObjectInputStream(s.getInputStream());
+            String ip = (String)entrada.readObject();
             // si esta maquina ya es el servidor, no hace nada
             // si no, instancia el servidor y lo pone visible
             String iplocal=obtenerIPLocal();
           	if(iplocal.equals(ip))
           	{
-          		System.out.println("Tu eres el que tiene el mejor rank");
+          		System.out.println("Main -> Tu eres el que tiene el mejor rank");
           		if(server == null) 
           		{
+          			System.out.println("Main -> Iniciando servidor...");
                 	server = new Servidor();
                 	server.interfazServidor().setVisible(true);
                 }
