@@ -397,7 +397,6 @@ public class Cliente extends JFrame implements ActionListener
 								try {
 									obtenerDatos();
 									enviarDatos(txtIPdestino.getText().toString(),Integer.parseInt(txtPuerto.getText()));
-									
 									Thread.sleep(5000);
 								} catch (IOException | NumberFormatException | SigarException | InterruptedException e1){
 									e1.printStackTrace();

@@ -181,7 +181,6 @@ public class Servidor extends JFrame implements ActionListener
                 	Datos data = (Datos)ois.readObject();
                 	cargarDatos(data, s.getInetAddress().toString()); 
                 	System.out.println("Se cargaron los datos");
-                	Thread.sleep(5000);
                     } catch (ClassNotFoundException | IOException | InterruptedException e) {
 						e.printStackTrace();
 						System.out.println("!Error: " + e.getMessage());
@@ -217,31 +216,31 @@ public class Servidor extends JFrame implements ActionListener
 		int pts=0;
 		// serie de cpu intel y AMD (mejorable)
 		if(datos.getModeloProcesador().contains("i7")) {
-			pts+=1000;
-		} else if(datos.getModeloProcesador().contains("i5")) {
-			pts+=800;
-		} else if(datos.getModeloProcesador().contains("i3")) {
 			pts+=600;
-		} else if(datos.getModeloProcesador().contains("Pentium")) {
+		} else if(datos.getModeloProcesador().contains("i5")) {
+			pts+=500;
+		} else if(datos.getModeloProcesador().contains("i3")) {
 			pts+=400;
-		} else if(datos.getModeloProcesador().contains("Celeron")) {
-			pts+=200;
-		} else if(datos.getModeloProcesador().contains("A8")) {
+		} else if(datos.getModeloProcesador().contains("Pentium")) {
 			pts+=300;
+		} else if(datos.getModeloProcesador().contains("Celeron")) {
+			pts+=100;
+		} else if(datos.getModeloProcesador().contains("A8")) {
+			pts+=200;
 		}
 		
 		// velocidad de cpu
 		double cpufreq = Double.parseDouble(datos.getVelocidadProcesador());
 		if(cpufreq >= 3200) {
-			pts+=1100;
+			pts+=500;
 		}else if(cpufreq < 3200 && cpufreq >= 2400) {
-			pts+=900;
+			pts+=400;
 		} else if(cpufreq < 2400 && cpufreq >= 1900) {
-			pts+=700;
+			pts+=300;
 		} else if(cpufreq < 1900 && cpufreq >= 1400) {
-			pts=500;
+			pts=200;
 		}else {
-			pts+=200;
+			pts+=100;
 		}
 		
 		// RAM total
@@ -297,17 +296,17 @@ public class Servidor extends JFrame implements ActionListener
 		// disco libre %
 		double discoLibre = Double.parseDouble(datos.getDiscoLibre());
 		if(discoLibre >= 90) {
-			pts+=1400;
+			pts+=500;
 		} else if(discoLibre < 90 && discoLibre >= 80) {
-			pts+=1250;
+			pts+=450;
 		} else if(discoLibre < 80 && discoLibre >= 70) {
-			pts+=950;
+			pts+=400;
 		} else if(discoLibre < 70 && discoLibre >= 60) {
-			pts+=700;
+			pts+=350;
 		} else if(discoLibre < 60 && discoLibre >= 50) {
-			pts+=550;
-		} else {
 			pts+=300;
+		} else {
+			pts+=250;
 		}
 		
 		return pts; 
@@ -414,7 +413,7 @@ public class Servidor extends JFrame implements ActionListener
 		}
 		
 		try {
-			Thread.sleep(10000);
+			//Thread.sleep(10000);
 			enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -443,8 +442,8 @@ public class Servidor extends JFrame implements ActionListener
 			oos3 = new DataOutputStream(s3.getOutputStream());
 			oos3.writeUTF(IpMejorRank);
 			System.out.println("Servidor -> Se le envio la alerta al servidor: " + IpMejorRank);
-			if(IpMejorRank.equals(obtenerIPLocal())) {
-				cerrarConexion();
+			if(!IpMejorRank.equals(obtenerIPLocal())) {
+				interfazServidor().setVisible(false);
 			}
 			
 		} catch(Exception e) {
@@ -579,6 +578,6 @@ public class Servidor extends JFrame implements ActionListener
 		        } catch (SocketException e) {
 		            System.err.println("Error -> " + e.getMessage());
 		        }
-			return direccionIP;
+			return direccionIP.replace("/", "");
 		}
 }
