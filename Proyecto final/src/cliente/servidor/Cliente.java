@@ -349,8 +349,9 @@ public class Cliente extends JFrame implements ActionListener
 	            	 // leo la ip enviada desde la difusion del nuevo servidor
 	            	 // y la asigno al text field para que se tome de ahí cuando se cree
 	            	 // un nuevo socket.
-	            	 txtIPdestino.setText(ois2.readUTF());
-	            	 System.out.println("Cliente -> La IP mejor rankeada es: "  + ois2.readUTF());
+	            	 String recibo = ois2.readUTF();
+	            	 txtIPdestino.setText(recibo);
+	            	 System.out.println("Cliente -> La IP mejor rankeada es: "  + recibo);
 	             } catch (IOException  e) {
 					e.printStackTrace();
 					System.out.println("Cliente - >!Error: " + e.getMessage());
@@ -410,7 +411,7 @@ public class Cliente extends JFrame implements ActionListener
 					}
 					enviandoDatos = true;
 					System.out.println("Cliente -> enviando datos a servidor...");
-					txtIPdestino.setEditable(false);
+					//txtIPdestino.setEditable(false);
 				}
 			}
 		}
