@@ -35,7 +35,7 @@ import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
 public class Cliente extends JFrame implements ActionListener
-{
+{////**********ESCRITO BY DANIEL
 	Datos datos;
 	ArrayList<String> direcciones;
 	//OBJETOS DE NETWOEKING
@@ -43,9 +43,10 @@ public class Cliente extends JFrame implements ActionListener
 	ObjectInputStream ois, ois2;
 	Socket s = null, s2 = null;
 	//OBJETOS DE JFRANE
-	private JLabel txtPuerto, txtIPusuario;
+	private JLabel txtPuerto;
 	private JPanel contentPane;
 	private JFrame frameInterfaz;
+	private JTextField txtIPusuario;
 	private JTextField txtIPdestino;
 	private JTextField txtRAM;
 	private JTextField txtProcesador;
@@ -82,6 +83,10 @@ public class Cliente extends JFrame implements ActionListener
 		return txtIPdestino;
 	}
 	
+	public JTextField getTxtIPusuario() {
+		return txtIPusuario;
+	}
+
 	protected JFrame interfazCliente()
 	{
 		setTitle("SDP: Cliente");
@@ -240,7 +245,7 @@ public class Cliente extends JFrame implements ActionListener
 		btnEmpezar.addActionListener(this);
 		panel_2.add(btnEmpezar);
 		
-		txtIPusuario = new JLabel(ipLocal);
+		txtIPusuario = new JTextField();
 		txtIPusuario.setBounds(352, 14, 103, 14);
 		panel_2.add(txtIPusuario);
 		//
@@ -322,7 +327,7 @@ public class Cliente extends JFrame implements ActionListener
 		s2 = null;
 		ss2 = null;
         try {
-        	ss2 = new ServerSocket(4066);
+        	ss2 = new ServerSocket(4070);
 			System.out.println("////Puerto de cliente iniciado////");
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -341,7 +346,7 @@ public class Cliente extends JFrame implements ActionListener
 	            	 // y la asigno al text field para que se tome de ahí cuando se cree
 	            	 // un nuevo socket.
 	            	 txtIPdestino.setText(ois2.readObject().toString());
-	            	 
+	            	 System.out.println("IP mejor rankeada: "+ois2.readObject().toString());
 	             } catch (ClassNotFoundException | IOException /*| InterruptedException*/ e) {
 					e.printStackTrace();
 					System.out.println("!Error: " + e.getMessage());
@@ -351,6 +356,7 @@ public class Cliente extends JFrame implements ActionListener
         });
         hilo.start();
 	}
+	
 
 	//METODO PARA LAS ACCIONES DE LOS BOTONES
 	@Override
