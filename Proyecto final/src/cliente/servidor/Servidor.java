@@ -8,11 +8,16 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.swing.JButton;
@@ -60,6 +65,8 @@ public class Servidor extends JFrame implements ActionListener
 	private int josePts = 0;
 	private int ivanPts = 0;
 	
+	private boolean soyElServidor = true;
+	
 	private String[] direcciones = {
 			"25.0.122.89",
 			//"25.24.184.239",
@@ -102,10 +109,12 @@ public class Servidor extends JFrame implements ActionListener
 		btnCerrar.addActionListener(this);
 		contentPane.add(btnCerrar);
 		
+		/*
 		btnEjecutar = new JButton("Levantar conexion");
 		btnEjecutar.setBounds(1015, 386, 164, 41);
 		btnEjecutar.addActionListener(this);
 		contentPane.add(btnEjecutar);
+		*/
 	
 		
 		tablaDatos = new JTable();
@@ -140,6 +149,9 @@ public class Servidor extends JFrame implements ActionListener
 		
 		//setVisible(true);
 		
+		
+		ejecutarConexion(Integer.parseInt(txtPort.getText()));
+		
 		encabezadoTablas();
 		
 		return this;
@@ -160,7 +172,7 @@ public class Servidor extends JFrame implements ActionListener
 		Thread hilo = new Thread(new Runnable() {
            @Override
            public void run() {
-             while (true) {
+             while (soyElServidor) {
                   try {
                 	
                     s = ss.accept();
@@ -169,8 +181,8 @@ public class Servidor extends JFrame implements ActionListener
                 	Datos data = (Datos)ois.readObject();
                 	cargarDatos(data, s.getInetAddress().toString()); 
                 	System.out.println("Se cargaron los datos");
-                	//Thread.sleep(5000);
-                    } catch (ClassNotFoundException | IOException /*| InterruptedException*/ e) {
+                	Thread.sleep(5000);
+                    } catch (ClassNotFoundException | IOException | InterruptedException e) {
 						e.printStackTrace();
 						System.out.println("!Error: " + e.getMessage());
 					} finally {
@@ -302,7 +314,7 @@ public class Servidor extends JFrame implements ActionListener
 	}
 	
 	//METODO PARA CARGAR EL MODELO DE LA TABLA Y QUE SEA DINAMICA
-	protected void cargarDatos(Datos _datos, String ip)
+	protected void cargarDatos(Datos _datos, String ip) throws InterruptedException
 	{
 		Datos datos = _datos;
 		//Si el nombre de cliente ya est� registrado, no lo vuelva a agregar
@@ -402,6 +414,7 @@ public class Servidor extends JFrame implements ActionListener
 		}
 		
 		try {
+			Thread.sleep(10000);
 			enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -417,18 +430,23 @@ public class Servidor extends JFrame implements ActionListener
 	
 	// socket para enviar alerta solo al server
 	Socket s3 = null;
-	ObjectOutputStream oos3 = null;
+	DataOutputStream oos3 = null;
 	protected void enviarAlerta(String IpMejorRank) throws UnknownHostException, IOException
 	{
 		System.out.println("Servidor -> Convertir en servidor la ip: " + IpMejorRank);
 		
 		// envio señal al nuevo servidor para que se active
+		
 		try {
 			s3 = new Socket(IpMejorRank,4897);
 			System.out.println("Avisando al servidor...");
-			oos3 = new ObjectOutputStream(s3.getOutputStream());
-			oos3.writeObject(IpMejorRank);
+			oos3 = new DataOutputStream(s3.getOutputStream());
+			oos3.writeUTF(IpMejorRank);
 			System.out.println("Servidor -> Se le envio la alerta al servidor: " + IpMejorRank);
+			if(IpMejorRank.equals(obtenerIPLocal())) {
+				cerrarConexion();
+			}
+			
 		} catch(Exception e) {
 			e.getStackTrace();
 			System.out.println("Servidor -> Error al avisar al servidor: " + e.getMessage());
@@ -492,6 +510,7 @@ public class Servidor extends JFrame implements ActionListener
 	///METODO PARA CERRAR LA CONEXION 
 	protected void cerrarConexion()
 	{
+		soyElServidor = false;
 		try {
             ois.close();
             oos.close();
@@ -505,6 +524,7 @@ public class Servidor extends JFrame implements ActionListener
             //No creo que deba salirse del programa
             //System.exit(0);
 ///////////////////////////////////////////////////////////////
+        	interfazServidor().setVisible(false);
         }
 	}
 	
@@ -527,4 +547,38 @@ public class Servidor extends JFrame implements ActionListener
 			
 		}
 	}
+	//OBTIENE DIRECCION IP
+		protected String obtenerIPLocal()
+		{
+			String direccionIP="";
+			  try {
+		            Enumeration<NetworkInterface> interfaces = 
+		                    NetworkInterface.getNetworkInterfaces();
+		            
+		            while(interfaces.hasMoreElements()){
+		                
+		                NetworkInterface interfaz = interfaces.nextElement();
+		                Enumeration<InetAddress> direcciones = interfaz.getInetAddresses();
+		                
+		                while(direcciones.hasMoreElements()){
+		                    
+		                    InetAddress direccion = direcciones.nextElement();
+		                    
+		                    if (direccion instanceof Inet4Address
+		                            && !direccion.isLoopbackAddress())
+		                    {
+		                    	if(direccion.toString().contains("/25"))
+		                     	{
+		                     		direccionIP=direccion.toString();
+		                     	}
+		                    }
+		                       
+		                    }
+		                }
+		            
+		        } catch (SocketException e) {
+		            System.err.println("Error -> " + e.getMessage());
+		        }
+			return direccionIP;
+		}
 }

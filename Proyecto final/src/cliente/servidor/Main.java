@@ -19,6 +19,7 @@ import java.util.HashMap;
 //***///
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -28,7 +29,7 @@ public class Main extends JFrame implements ActionListener
 	private JPanel contentPane;
 	private Socket s, s2;
 	private ServerSocket ss, ss2;
-	private ObjectInputStream entrada;	
+	private DataInputStream entrada;	
 	private Servidor server = null;
 	JButton btnEmpezar;
 	static Main main;
@@ -45,7 +46,7 @@ public class Main extends JFrame implements ActionListener
 		Cliente c=new Cliente();
 		c.interfazCliente().setVisible(true);	
 		main=new Main();
-		main.interfaz().setVisible(true);;
+		main.interfaz().setVisible(true);
 		main.recibirSenal();
 	}
 	
@@ -68,23 +69,24 @@ public class Main extends JFrame implements ActionListener
                   {
                 	  // se ha recibido la alerta de que es el nuevo servidor (esta maquina)
                     s = ss.accept();
-                    entrada = new ObjectInputStream(s.getInputStream());
-                    String ip = (String)entrada.readObject();
+                    entrada = new DataInputStream(s.getInputStream());
+                    String ip = entrada.readUTF();
                     // si esta maquina ya es el servidor, no hace nada
                     // si no, instancia el servidor y lo pone visible
-                    String iplocal=obtenerIPLocal();
-                  	if(iplocal.equals(ip))
+                    
+
+                  	System.out.println("Main -> Tu eres el que tiene el mejor rank");
+                  	
+                  	if(server == null) 
                   	{
-                  		System.out.println("Main -> Tu eres el que tiene el mejor rank");
-                  		if(server == null) 
-                  		{
-                  			System.out.println("Main -> Iniciando servidor...");
-                        	server = new Servidor();
-                        	server.interfazServidor().setVisible(true);
-                        }
-                  	}
+                  		JOptionPane.showMessageDialog(null, "Tu eres el que tiene el mejor rank");
+                  		System.out.println("Main -> Iniciando servidor...");
+                        server = new Servidor();
+                        server.interfazServidor().setVisible(true);
+                    }
+
               
-                    } catch (IOException | ClassNotFoundException e) {
+                    } catch (IOException  e) {
                         System.err.println("Error -> " + e.getMessage());
                     }
                 
@@ -98,40 +100,7 @@ public class Main extends JFrame implements ActionListener
 		
       }
       
-	//OBTIENE DIRECCION IP
-	protected String obtenerIPLocal()
-	{
-		String direccionIP="";
-		  try {
-	            Enumeration<NetworkInterface> interfaces = 
-	                    NetworkInterface.getNetworkInterfaces();
-	            
-	            while(interfaces.hasMoreElements()){
-	                
-	                NetworkInterface interfaz = interfaces.nextElement();
-	                Enumeration<InetAddress> direcciones = interfaz.getInetAddresses();
-	                
-	                while(direcciones.hasMoreElements()){
-	                    
-	                    InetAddress direccion = direcciones.nextElement();
-	                    
-	                    if (direccion instanceof Inet4Address
-	                            && !direccion.isLoopbackAddress())
-	                    {
-	                    	if(direccion.toString().contains("/25"))
-	                     	{
-	                     		direccionIP=direccion.toString();
-	                     	}
-	                    }
-	                       
-	                    }
-	                }
-	            
-	        } catch (SocketException e) {
-	            System.err.println("Error -> " + e.getMessage());
-	        }
-		return direccionIP;
-	}
+	
 	
 	private JFrame interfaz()
 	{
@@ -189,7 +158,7 @@ public class Main extends JFrame implements ActionListener
 	{
 		if(arg0.getSource()==btnEmpezar)
 		{
-			Servidor server=new Servidor();
+			server=new Servidor();
 			server.interfazServidor().setVisible(true);
 			main.interfaz().setVisible(false);
 		}
