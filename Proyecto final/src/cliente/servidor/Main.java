@@ -82,8 +82,10 @@ public class Main extends JFrame implements ActionListener
                   		JOptionPane.showMessageDialog(null, "Tu eres el que tiene el mejor rank");
                   		System.out.println("Main -> Iniciando servidor...");
                         server = new Servidor();
-                        server.interfazServidor().setVisible(true);
                     }
+                  	/*if(!server.interfazServidor().isVisible()) {
+                  		server.interfazServidor().setVisible(true);
+                  	}*/
 
               
                     } catch (IOException  e) {

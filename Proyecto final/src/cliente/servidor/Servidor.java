@@ -51,6 +51,8 @@ public class Servidor extends JFrame implements ActionListener
 	private JButton btnEjecutar;
 	private JTextField txtPort;
 	
+	private JFrame interfaz;
+	
 	private boolean serverIniciado = false;
 	
 	private String daniel = "/25.0.122.89";
@@ -91,6 +93,11 @@ public class Servidor extends JFrame implements ActionListener
 	
 	public HashMap<Integer, String> getPuntuacionesNombres() {
 		return puntuacionesNombres;
+	}
+	
+	public Servidor() {
+		interfaz = interfazServidor();
+		interfaz.setVisible(true);
 	}
 
 	//INTERFAZ DEL SERVER
@@ -413,7 +420,7 @@ public class Servidor extends JFrame implements ActionListener
 		}
 		
 		try {
-			//Thread.sleep(10000);
+			//Thread.sleep(2500);
 			enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -443,7 +450,9 @@ public class Servidor extends JFrame implements ActionListener
 			oos3.writeUTF(IpMejorRank);
 			System.out.println("Servidor -> Se le envio la alerta al servidor: " + IpMejorRank);
 			if(!IpMejorRank.equals(obtenerIPLocal())) {
-				interfazServidor().setVisible(false);
+				interfaz.setVisible(false);
+			} else if(!interfazServidor().isVisible()){
+				interfaz.setVisible(true);
 			}
 			
 		} catch(Exception e) {
@@ -523,7 +532,7 @@ public class Servidor extends JFrame implements ActionListener
             //No creo que deba salirse del programa
             //System.exit(0);
 ///////////////////////////////////////////////////////////////
-        	interfazServidor().setVisible(false);
+        	interfaz.setVisible(false);
         }
 	}
 	
