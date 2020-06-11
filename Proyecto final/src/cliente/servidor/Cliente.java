@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -40,7 +41,8 @@ public class Cliente extends JFrame implements ActionListener
 	ArrayList<String> direcciones;
 	//OBJETOS DE NETWOEKING
 	ObjectOutputStream oos, oos2;
-	ObjectInputStream ois, ois2;
+	ObjectInputStream ois;
+	DataInputStream ois2;
 	Socket s = null, s2 = null;
 	//OBJETOS DE JFRANE
 	private JLabel txtPuerto;
@@ -308,7 +310,7 @@ public class Cliente extends JFrame implements ActionListener
 			////ENVIO DE DATOS AL SERVIDOR
 		//	System.out.println("Empaquetando datos...");
 			oos.writeObject(datos);
-			System.out.println("Datos enviados");
+			System.out.println("Cliente -> Datos enviados");
 		}catch(Exception e){
 			e.printStackTrace();
 			System.out.println("!Error: " + e.getMessage());
@@ -329,7 +331,7 @@ public class Cliente extends JFrame implements ActionListener
 		s2 = null;
 		ss2 = null;
         try {
-        	ss2 = new ServerSocket(5000);
+        	ss2 = new ServerSocket(4892);
 			System.out.println("Cliente -> ////Puerto recibir alerta de servidor iniciado ////");
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -342,17 +344,34 @@ public class Cliente extends JFrame implements ActionListener
 	             try {
 	            	 //Thread.sleep(3000);
 	            	 s2 = ss2.accept();
-	            	 ois2 = new ObjectInputStream(s2.getInputStream());
+	            	 ois2 = new DataInputStream(s2.getInputStream());
 	            	 //String str = (String)ois2.readObject();
 	            	 // leo la ip enviada desde la difusion del nuevo servidor
 	            	 // y la asigno al text field para que se tome de ahí cuando se cree
 	            	 // un nuevo socket.
-	            	 txtIPdestino.setText(ois2.readObject().toString());
-	            	 System.out.println("Cliente -> La IP mejor rankeada es: "  +ois2.readObject().toString());
-	             } catch (ClassNotFoundException | IOException  e) {
+	            	 txtIPdestino.setText(ois2.readUTF());
+	            	 System.out.println("Cliente -> La IP mejor rankeada es: "  + ois2.readUTF());
+	             } catch (IOException  e) {
 					e.printStackTrace();
-					System.out.println("!Error: " + e.getMessage());
-	             } 
+					System.out.println("Cliente - >!Error: " + e.getMessage());
+	             } finally {
+	            	 if(s2 != null) {
+	            		 try {
+							s2.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	            	 }
+	            	 if(ois2 != null) {
+	            		 try {
+							ois2.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	            	 }
+	             }
               }
            }
         });

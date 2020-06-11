@@ -32,7 +32,7 @@ public class Servidor extends JFrame implements ActionListener
 	//4560
 	private ObjectInputStream ois=null;
 	private ObjectOutputStream oos=null;
-	private ObjectOutputStream salida=null;
+	private DataOutputStream salida=null;
 	private Socket s=null, s2 = null;
 	private ServerSocket ss, ss2 = null;
 	//OBJETOS DEL JFRAME
@@ -62,10 +62,10 @@ public class Servidor extends JFrame implements ActionListener
 	
 	private String[] direcciones = {
 			"25.0.122.89",
-			"25.24.184.239",
-			"25.18.90.103",
-			"25.11.6.101",
-			"25.12.252.241"
+			//"25.24.184.239",
+			"25.18.90.103"
+			//"25.11.6.101",
+			//"25.12.252.241"
 	};
 	
 	private String[] nombres = {
@@ -439,18 +439,20 @@ public class Servidor extends JFrame implements ActionListener
 		// les envia la senal a todos los clientes
 		for(int i = 0; i < direcciones.length; i++) {
 			try {
-				s2 = new Socket(direcciones[i],5000);
+				s2 = new Socket(direcciones[i],4892);
 				System.out.println("Servidor -> nuevo socket cargado para la ip: " + direcciones[i]);
-				salida = new ObjectOutputStream(s2.getOutputStream());
+				salida = new DataOutputStream(s2.getOutputStream());
 				salida.writeUTF(IpMejorRank);
-				System.out.println("Servidor -> Difusion: Se envio a " + direcciones[i]);
+				System.out.println("Servidor -> Difusion (nuevo server es " + IpMejorRank + "): Se envio a " + direcciones[i]);
 			} catch(Exception e) {
 				//Excepci�n de "Connection refused: connect"
 				e.getStackTrace();
 				System.out.println("Servidor -> !Error en enviar alerta a " + direcciones[i] + "! : " + e.getMessage());
-			}
-			if(s2 != null) s2.close();
-			if(salida != null) salida.close();
+			} /*finally {
+				if(s2 != null) s2.close();
+				if(salida != null) salida.close();
+			}*/
+			
 		}
 		
 	}

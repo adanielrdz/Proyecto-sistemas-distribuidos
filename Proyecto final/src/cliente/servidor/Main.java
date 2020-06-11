@@ -59,35 +59,43 @@ public class Main extends JFrame implements ActionListener
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		while (true) 
-		{
-          try 
-          {
-        	  // se ha recibido la alerta de que es el nuevo servidor (esta maquina)
-            s = ss.accept();
-            entrada = new ObjectInputStream(s.getInputStream());
-            String ip = (String)entrada.readObject();
-            // si esta maquina ya es el servidor, no hace nada
-            // si no, instancia el servidor y lo pone visible
-            String iplocal=obtenerIPLocal();
-          	if(iplocal.equals(ip))
-          	{
-          		System.out.println("Main -> Tu eres el que tiene el mejor rank");
-          		if(server == null) 
-          		{
-          			System.out.println("Main -> Iniciando servidor...");
-                	server = new Servidor();
-                	server.interfazServidor().setVisible(true);
-                }
-          	}
-      
-            } catch (SocketException e) {
-                System.err.println("Error -> " + e.getMessage());
-            }
-        
-            // le aviso a todos quien es el nuevo servidor
-            //enviarDifusionIp(ip);
-            } 
+        Thread hilo = new Thread(new Runnable() {
+        	@Override
+        	public void run() {
+        		while (true) 
+        		{
+                  try 
+                  {
+                	  // se ha recibido la alerta de que es el nuevo servidor (esta maquina)
+                    s = ss.accept();
+                    entrada = new ObjectInputStream(s.getInputStream());
+                    String ip = (String)entrada.readObject();
+                    // si esta maquina ya es el servidor, no hace nada
+                    // si no, instancia el servidor y lo pone visible
+                    String iplocal=obtenerIPLocal();
+                  	if(iplocal.equals(ip))
+                  	{
+                  		System.out.println("Main -> Tu eres el que tiene el mejor rank");
+                  		if(server == null) 
+                  		{
+                  			System.out.println("Main -> Iniciando servidor...");
+                        	server = new Servidor();
+                        	server.interfazServidor().setVisible(true);
+                        }
+                  	}
+              
+                    } catch (IOException | ClassNotFoundException e) {
+                        System.err.println("Error -> " + e.getMessage());
+                    }
+                
+                    // le aviso a todos quien es el nuevo servidor
+                    //enviarDifusionIp(ip);
+                    } 
+        	}
+        	
+        });
+        hilo.start();
+		
       }
       
 	//OBTIENE DIRECCION IP
