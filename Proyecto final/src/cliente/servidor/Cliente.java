@@ -306,10 +306,10 @@ public class Cliente extends JFrame implements ActionListener
 			////ENVIO DE DATOS AL SERVIDOR
 		//	System.out.println("Empaquetando datos...");
 			oos.writeObject(datos);
-			System.out.println("Datos enviados");
+			System.out.println("[Cliente] Datos enviados");
 		}catch(Exception e){
 			e.printStackTrace();
-			System.out.println("!Error: " + e.getMessage());
+			System.out.println("[Cliente] !Error -> " + e.getMessage());
 		}
 	}
 	
@@ -317,7 +317,7 @@ public class Cliente extends JFrame implements ActionListener
 	protected void cerrarConexion() throws IOException{
 		if(oos != null)oos.close();
 		if(s!=null)s.close();
-		System.out.println("////Puerto de cliente cerrado///");
+		System.out.println("[Cliente] Puerto cerrado");
 	}
 
 	/*
@@ -378,7 +378,7 @@ public class Cliente extends JFrame implements ActionListener
 									Thread.sleep(5000);
 								} catch (IOException | NumberFormatException | SigarException | InterruptedException e1){
 									e1.printStackTrace();
-									System.out.println("!Error: " + e1.getMessage());
+									System.out.println("[Cliente] !Error -> " + e1.getMessage());
 								} 
 							}
 						}
@@ -388,7 +388,7 @@ public class Cliente extends JFrame implements ActionListener
 						hilo.start();
 					}
 					enviandoDatos = true;
-					System.out.println("enviando datos...");
+					System.out.println("[Cliente] enviando datos...");
 					txtIPdestino.setEditable(false);
 				}
 			}
@@ -403,7 +403,7 @@ public class Cliente extends JFrame implements ActionListener
 					obtenerDatos();
 				} catch (UnknownHostException | SigarException e1) {
 					e1.printStackTrace();
-					System.out.println("!Error: " + e1.getMessage());
+					System.out.println("[Cliente] !Error -> " + e1.getMessage());
 				}
 			}
 		}
@@ -411,13 +411,13 @@ public class Cliente extends JFrame implements ActionListener
 		if(e.getSource()==btnParar) {
 			if(!parar) {
 				if(enviandoDatos) {
-					System.out.println("Dejando de enviar datos...");
+					System.out.println("[Cliente] Dejando de enviar datos...");
 					try {
 						parar = true;
 						cerrarConexion();
 					}catch(Exception e1) {
 						e1.printStackTrace();
-						System.out.println("!Error: " + e1.getMessage());
+						System.out.println("[Cliente] !Error -> " + e1.getMessage());
 					}
 					enviandoDatos = false;
 				}

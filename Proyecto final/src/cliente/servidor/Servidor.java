@@ -153,7 +153,7 @@ public class Servidor extends JFrame implements ActionListener
 		ss = null;
         try {
 			ss = new ServerSocket(port);
-			System.out.println("////Puerto de servidor abierto////");
+			System.out.println("[Server] Puerto abierto");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -164,15 +164,15 @@ public class Servidor extends JFrame implements ActionListener
                   try {
                 	
                     s = ss.accept();
-                    System.out.println("Conexión establecida con: " + s.getInetAddress() + "\n");
+                    System.out.println("[Server] Conexión establecida con: " + s.getInetAddress() + "\n");
                     ois = new ObjectInputStream(s.getInputStream());
                 	Datos data = (Datos)ois.readObject();
                 	cargarDatos(data, s.getInetAddress().toString()); 
-                	System.out.println("Se cargaron los datos");
+                	System.out.println("[Server] Se cargaron los datos");
                 	//Thread.sleep(5000);
                     } catch (ClassNotFoundException | IOException /*| InterruptedException*/ e) {
 						e.printStackTrace();
-						System.out.println("!Error: " + e.getMessage());
+						System.out.println("[Server] !Error -> " + e.getMessage());
 					}
                 }
             }
@@ -386,7 +386,7 @@ public class Servidor extends JFrame implements ActionListener
 			enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("!Error al enviar alerta!2: " + e.getMessage());
+			System.out.println("[Server] !Error al enviar alerta!2 -> " + e.getMessage());
 		}
 		/*	
 		//TABLA Y MODEO DE RANKEO
@@ -399,18 +399,18 @@ public class Servidor extends JFrame implements ActionListener
 	
 	protected void enviarAlerta(String IpMejorRank) throws UnknownHostException, IOException
 	{
-		System.out.println("Convertir en servidor la ip: " + IpMejorRank);
+		System.out.println("[Server] Ip con mejor rank: " + IpMejorRank);
 		for(int i = 0; i < direcciones.length; i++) {
 			try {
 				s2 = new Socket(direcciones[i],5000);
-				System.out.println("nuevo socket cargado para la ip: " + direcciones[i]);
+				System.out.println("[Server] nuevo socket cargado para: " + direcciones[i]);
 				salida = new DataOutputStream(s2.getOutputStream());
 				salida.writeUTF(IpMejorRank);
-				System.out.println("Se enviaron");
+				System.out.println("[Server] Se enviaron");
 			} catch(Exception e) {
 				//Excepción de "Connection refused: connect"
 				e.getStackTrace();
-				System.out.println("!Error en enviar alerta! : " + e.getMessage());
+				System.out.println("[Server] !Error en enviar alerta! -> " + e.getMessage());
 			} finally {
 				if(s2 != null) s2.close();
 				if(ss2 != null) ss2.close();
@@ -459,10 +459,10 @@ public class Servidor extends JFrame implements ActionListener
             ois.close();
             oos.close();
             s.close();
-            System.out.println("////Puerto de servidor cerrado///");
+            System.out.println("[Server] Puerto cerrado");
         } catch (IOException e) {
         	e.getStackTrace();
-        	System.out.println("!Error: " + e.getMessage());
+        	System.out.println("[Server] !Error -> " + e.getMessage());
         } finally {
 ///////////////////////////////////////////////////////////////
             //No creo que deba salirse del programa
