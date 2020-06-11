@@ -161,10 +161,11 @@ public class Servidor extends JFrame implements ActionListener
                   try {
                 	
                     s = ss.accept();
-                    System.out.println("Conexión establecida con: " + s.getInetAddress() + "\n");
+                    System.out.println("Conexiï¿½n establecida con: " + s.getInetAddress() + "\n");
                     ois = new ObjectInputStream(s.getInputStream());
                 	Datos data = (Datos)ois.readObject();
-                	cargarDatos(data, s.getInetAddress().toString());    
+                	cargarDatos(data, s.getInetAddress().toString());
+                	enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
                 	//Thread.sleep(5000);
                     } catch (ClassNotFoundException | IOException /*| InterruptedException*/ e) {
 						e.printStackTrace();
@@ -182,31 +183,31 @@ public class Servidor extends JFrame implements ActionListener
 		int pts=0;
 		// serie de cpu intel y AMD (mejorable)
 		if(datos.getModeloProcesador().contains("i7")) {
-			pts+=1000;
-		} else if(datos.getModeloProcesador().contains("i5")) {
-			pts+=800;
-		} else if(datos.getModeloProcesador().contains("i3")) {
 			pts+=600;
-		} else if(datos.getModeloProcesador().contains("Pentium")) {
+		} else if(datos.getModeloProcesador().contains("i5")) {
+			pts+=500;
+		} else if(datos.getModeloProcesador().contains("i3")) {
 			pts+=400;
-		} else if(datos.getModeloProcesador().contains("Celeron")) {
-			pts+=200;
-		} else if(datos.getModeloProcesador().contains("A8")) {
+		} else if(datos.getModeloProcesador().contains("Pentium")) {
 			pts+=300;
+		} else if(datos.getModeloProcesador().contains("Celeron")) {
+			pts+=100;
+		} else if(datos.getModeloProcesador().contains("A8")) {
+			pts+=200;
 		}
 		
 		// velocidad de cpu
 		double cpufreq = Double.parseDouble(datos.getVelocidadProcesador());
 		if(cpufreq >= 3200) {
-			pts+=1100;
+			pts+=600;
 		}else if(cpufreq < 3200 && cpufreq >= 2400) {
-			pts+=900;
+			pts+=500;
 		} else if(cpufreq < 2400 && cpufreq >= 1900) {
-			pts+=700;
+			pts+=400;
 		} else if(cpufreq < 1900 && cpufreq >= 1400) {
-			pts=500;
+			pts=300;
 		}else {
-			pts+=200;
+			pts+=150;
 		}
 		
 		// RAM total
@@ -246,7 +247,7 @@ public class Servidor extends JFrame implements ActionListener
 		// RAM libre %
 		double ramLibre =Double.parseDouble(datos.getRamLibre());
 		if(ramLibre >= 90) {
-			pts+=1400;
+			pts+=1500;
 		} else if(ramLibre < 90 && ramLibre >= 80) {
 			pts+=1250;
 		} else if(ramLibre < 80 && ramLibre >= 70) {
@@ -262,17 +263,17 @@ public class Servidor extends JFrame implements ActionListener
 		// disco libre %
 		double discoLibre = Double.parseDouble(datos.getDiscoLibre());
 		if(discoLibre >= 90) {
-			pts+=1400;
-		} else if(discoLibre < 90 && discoLibre >= 80) {
-			pts+=1250;
-		} else if(discoLibre < 80 && discoLibre >= 70) {
-			pts+=950;
-		} else if(discoLibre < 70 && discoLibre >= 60) {
 			pts+=700;
+		} else if(discoLibre < 90 && discoLibre >= 80) {
+			pts+=600;
+		} else if(discoLibre < 80 && discoLibre >= 70) {
+			pts+=500;
+		} else if(discoLibre < 70 && discoLibre >= 60) {
+			pts+=400;
 		} else if(discoLibre < 60 && discoLibre >= 50) {
-			pts+=550;
-		} else {
 			pts+=300;
+		} else {
+			pts+=200;
 		}
 		
 		return pts; 
@@ -378,12 +379,6 @@ public class Servidor extends JFrame implements ActionListener
 			
 		}
 		
-		try {
-			enviarAlerta(puntuacionesIp.get(puntuaciones[4]));
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("!Error: " + e.getMessage());
-		}
 		
 		/*
 		//TABLA Y MODEO DE RANKEO
@@ -404,7 +399,7 @@ public class Servidor extends JFrame implements ActionListener
 				oos2 = new ObjectOutputStream(s2.getOutputStream());
 				oos2.writeObject(IpMejorRank);
 			} catch(Exception e) {
-				//Excepción de "Connection refused: connect"
+				//Excepciï¿½n de "Connection refused: connect"
 				e.getStackTrace();
 				System.out.println("!Error: " + e.getMessage());
 			} finally {
@@ -413,6 +408,7 @@ public class Servidor extends JFrame implements ActionListener
 				if(oos2 != null) oos2.close();
 			}
 		}
+		
 		
 	}
 	
@@ -480,7 +476,7 @@ public class Servidor extends JFrame implements ActionListener
 				serverIniciado = true;
 				txtPort.setEditable(false);
 			}else {
-				JOptionPane.showMessageDialog(null, "Ingrese un puerto para levantar conexión");
+				JOptionPane.showMessageDialog(null, "Ingrese un puerto para levantar conexiï¿½n");
 			}
 			
 		}
