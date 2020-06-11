@@ -26,6 +26,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class Servidor extends JFrame implements ActionListener
 {
+	/*by danie*/
 	//4560
 	private ObjectInputStream ois=null, ois2 = null;
 	private ObjectOutputStream oos=null, oos2 = null;
@@ -354,10 +355,10 @@ public class Servidor extends JFrame implements ActionListener
 		// hardcode direcciones ip nombres
 		/*
 		 * private String daniel = "/25.0.122.89";
-	private String cesar = "/25.24.184.239";
-	private String erik = "/25.18.90.103";
-	private String jose = "/25.11.6.101";
-	private String ivan = "/25.12.252.241";*/
+		private String cesar = "/25.24.184.239";
+		private String erik = "/25.18.90.103";
+		private String jose = "/25.11.6.101";
+		private String ivan = "/25.12.252.241";*/
 		
 		puntuacionesIp.put(danielPts,"25.0.122.89");
 		puntuacionesIp.put(cesarPts,"25.24.184.239");
@@ -398,7 +399,7 @@ public class Servidor extends JFrame implements ActionListener
 		System.out.println("Convertir en servidor la ip: " + IpMejorRank);
 		for(int i = 0; i < direcciones.length; i++) {
 			try {
-				s2 = new Socket(direcciones[i],4066);
+				s2 = new Socket(direcciones[i],4070);
 				System.out.println("nuevo socket cargado para la ip: " + direcciones[i]);
 				oos2 = new ObjectOutputStream(s2.getOutputStream());
 				oos2.writeObject(IpMejorRank);
