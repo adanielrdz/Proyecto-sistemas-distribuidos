@@ -306,10 +306,10 @@ public class Cliente extends JFrame implements ActionListener
 			////ENVIO DE DATOS AL SERVIDOR
 		//	System.out.println("Empaquetando datos...");
 			oos.writeObject(datos);
-			System.out.println("[Cliente] Datos enviados");
+			System.out.println("Datos enviados");
 		}catch(Exception e){
 			e.printStackTrace();
-			System.out.println("[Cliente] !Error -> " + e.getMessage());
+			System.out.println("!Error: " + e.getMessage());
 		}
 	}
 	
@@ -317,16 +317,16 @@ public class Cliente extends JFrame implements ActionListener
 	protected void cerrarConexion() throws IOException{
 		if(oos != null)oos.close();
 		if(s!=null)s.close();
-		System.out.println("[Cliente] Puerto cerrado");
+		System.out.println("////Puerto de cliente cerrado///");
 	}
 
-	/*
+	
 	protected void recibirDatos(){
 		ois2 = null;
 		s2 = null;
 		ss2 = null;
         try {
-        	ss2 = new ServerSocket(4070);
+        	ss2 = new ServerSocket(5000);
 			System.out.println("////Puerto de cliente iniciado////");
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -346,7 +346,7 @@ public class Cliente extends JFrame implements ActionListener
 	            	 // un nuevo socket.
 	            	 txtIPdestino.setText(ois2.readObject().toString());
 	            	 System.out.println("IP mejor rankeada: "+ois2.readObject().toString());
-	             } catch (ClassNotFoundException | IOException /*| InterruptedException e) {
+	             } catch (ClassNotFoundException | IOException  e) {
 					e.printStackTrace();
 					System.out.println("!Error: " + e.getMessage());
 	             } 
@@ -355,14 +355,13 @@ public class Cliente extends JFrame implements ActionListener
         });
         hilo.start();
 	}
-	*/
 
 	//METODO PARA LAS ACCIONES DE LOS BOTONES
 	@Override
 	public void actionPerformed(ActionEvent e){
 		if(e.getSource()==btnEmpezar) {
 			if(txtIPdestino.getText().isEmpty()) {
-				JOptionPane.showMessageDialog(null, "Ingrese la dirección IP de destino");
+				JOptionPane.showMessageDialog(null, "Ingrese la direcciï¿½n IP de destino");
 			}else {
 				if(!enviandoDatos){
 					if(parar) {
@@ -378,7 +377,7 @@ public class Cliente extends JFrame implements ActionListener
 									Thread.sleep(5000);
 								} catch (IOException | NumberFormatException | SigarException | InterruptedException e1){
 									e1.printStackTrace();
-									System.out.println("[Cliente] !Error -> " + e1.getMessage());
+									System.out.println("!Error: " + e1.getMessage());
 								} 
 							}
 						}
@@ -388,7 +387,7 @@ public class Cliente extends JFrame implements ActionListener
 						hilo.start();
 					}
 					enviandoDatos = true;
-					System.out.println("[Cliente] enviando datos...");
+					System.out.println("enviando datos...");
 					txtIPdestino.setEditable(false);
 				}
 			}
@@ -403,7 +402,7 @@ public class Cliente extends JFrame implements ActionListener
 					obtenerDatos();
 				} catch (UnknownHostException | SigarException e1) {
 					e1.printStackTrace();
-					System.out.println("[Cliente] !Error -> " + e1.getMessage());
+					System.out.println("!Error: " + e1.getMessage());
 				}
 			}
 		}
@@ -411,13 +410,13 @@ public class Cliente extends JFrame implements ActionListener
 		if(e.getSource()==btnParar) {
 			if(!parar) {
 				if(enviandoDatos) {
-					System.out.println("[Cliente] Dejando de enviar datos...");
+					System.out.println("Dejando de enviar datos...");
 					try {
 						parar = true;
 						cerrarConexion();
 					}catch(Exception e1) {
 						e1.printStackTrace();
-						System.out.println("[Cliente] !Error -> " + e1.getMessage());
+						System.out.println("!Error: " + e1.getMessage());
 					}
 					enviandoDatos = false;
 				}

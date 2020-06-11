@@ -55,7 +55,7 @@ public class Main extends JFrame implements ActionListener
 		s = null;
 		ss=null;
         try {
-			ss = new ServerSocket(5000);
+			ss = new ServerSocket(4897);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -72,7 +72,7 @@ public class Main extends JFrame implements ActionListener
             String iplocal=obtenerIPLocal();
           	if(iplocal.equals(ip))
           	{
-          		System.out.println("[Main] Tienes el mejor rank");
+          		System.out.println("Tu eres el que tiene el mejor rank");
           		if(server == null) 
           		{
                 	server = new Servidor();
@@ -81,7 +81,7 @@ public class Main extends JFrame implements ActionListener
           	}
       
             } catch (SocketException e) {
-                System.err.println("[Main] Error -> " + e.getMessage());
+                System.err.println("Error -> " + e.getMessage());
             }
         
             // le aviso a todos quien es el nuevo servidor
@@ -119,7 +119,7 @@ public class Main extends JFrame implements ActionListener
 	                }
 	            
 	        } catch (SocketException e) {
-	            System.err.println("[Main] Error -> " + e.getMessage());
+	            System.err.println("Error -> " + e.getMessage());
 	        }
 		return direccionIP;
 	}
