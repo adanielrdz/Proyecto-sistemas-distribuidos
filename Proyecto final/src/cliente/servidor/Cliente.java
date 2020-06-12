@@ -35,6 +35,8 @@ import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
+import estres.factorial.program;
+
 public class Cliente extends JFrame implements ActionListener
 {////**********ESCRITO BY DANIEL
 	Datos datos;
@@ -237,7 +239,7 @@ public class Cliente extends JFrame implements ActionListener
 		txtPuerto.setBounds(94, 33, 46, 14);
 		panel_1.add(txtPuerto);
 		
-		btnParar = new JButton("Parar");
+		btnParar = new JButton("Estresar maquina");
 		btnParar.setBounds(271, 243, 89, 23);
 		btnParar.addActionListener(this);
 		panel_2.add(btnParar);
@@ -396,8 +398,9 @@ public class Cliente extends JFrame implements ActionListener
 							while(!parar){
 								try {
 									obtenerDatos();
+									Thread.sleep(4000);
 									enviarDatos(txtIPdestino.getText().toString(),Integer.parseInt(txtPuerto.getText()));
-									Thread.sleep(5000);
+									
 								} catch (IOException | NumberFormatException | SigarException | InterruptedException e1){
 									e1.printStackTrace();
 									System.out.println("!Error: " + e1.getMessage());
@@ -431,19 +434,7 @@ public class Cliente extends JFrame implements ActionListener
 		}
 		
 		if(e.getSource()==btnParar) {
-			if(!parar) {
-				if(enviandoDatos) {
-					System.out.println("Cliente -> Dejando de enviar datos...");
-					try {
-						parar = true;
-						cerrarConexion();
-					}catch(Exception e1) {
-						e1.printStackTrace();
-						System.out.println("!Error: " + e1.getMessage());
-					}
-					enviandoDatos = false;
-				}
-			}
+			program.estresar();
 			
 		}
 		

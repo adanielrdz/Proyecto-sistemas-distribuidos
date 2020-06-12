@@ -454,6 +454,7 @@ public class Servidor extends JFrame implements ActionListener
 			s3 = new Socket(IpMejorRank,4897);
 			System.out.println("Avisando al servidor...");
 			oos3 = new DataOutputStream(s3.getOutputStream());
+			//Thread.sleep(10000);
 			oos3.writeUTF(IpMejorRank);
 			System.out.println("Servidor -> Se le envio la alerta al servidor: " + IpMejorRank);
 			if(!IpMejorRank.equals(obtenerIPLocal())) {

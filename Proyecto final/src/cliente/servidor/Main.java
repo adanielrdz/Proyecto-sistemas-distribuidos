@@ -23,6 +23,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+//importar estres
+import estres.factorial.*;
+
 public class Main extends JFrame implements ActionListener
 {
 	///ESCRITO BY DANIEL
@@ -82,6 +85,7 @@ public class Main extends JFrame implements ActionListener
                   		System.out.println("Main -> Iniciando servidor...");
                   		JOptionPane.showMessageDialog(null, "Tu eres el que tiene el mejor rank");
                       	server.verVentana(true);
+                      	
                   	}
                   } catch (IOException  e) {
                         System.err.println("Error -> " + e.getMessage());
