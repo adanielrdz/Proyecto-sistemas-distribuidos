@@ -97,7 +97,14 @@ public class Servidor extends JFrame implements ActionListener
 	
 	public Servidor() {
 		interfaz = interfazServidor();
-		interfaz.setVisible(true);
+		interfaz.setVisible(false);
+		ejecutarConexion(Integer.parseInt(txtPort.getText()));
+	}
+	public void verVentana(boolean valor) {
+		interfaz.setVisible(valor);
+	}
+	public boolean seVeVentana() {
+		return interfaz.isVisible();
 	}
 
 	//INTERFAZ DEL SERVER
@@ -157,7 +164,7 @@ public class Servidor extends JFrame implements ActionListener
 		//setVisible(true);
 		
 		
-		ejecutarConexion(Integer.parseInt(txtPort.getText()));
+		
 		
 		encabezadoTablas();
 		
@@ -451,7 +458,7 @@ public class Servidor extends JFrame implements ActionListener
 			System.out.println("Servidor -> Se le envio la alerta al servidor: " + IpMejorRank);
 			if(!IpMejorRank.equals(obtenerIPLocal())) {
 				interfaz.setVisible(false);
-			} else if(!interfazServidor().isVisible()){
+			} else if(!interfaz.isVisible()){
 				interfaz.setVisible(true);
 			}
 			

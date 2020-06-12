@@ -30,7 +30,7 @@ public class Main extends JFrame implements ActionListener
 	private Socket s, s2;
 	private ServerSocket ss, ss2;
 	private DataInputStream entrada;	
-	private Servidor server = null;
+	private static Servidor server = null;
 	JButton btnEmpezar;
 	static Main main;
 	private String[] direcciones = {
@@ -41,16 +41,17 @@ public class Main extends JFrame implements ActionListener
 			"25.12.252.241"
 	};
 	
-		public static void main(String[]args) throws ClassNotFoundException, IOException, InterruptedException
+	public static void main(String[]args) throws ClassNotFoundException, IOException, InterruptedException
 	{
 		Cliente c=new Cliente();
 		c.interfazCliente().setVisible(true);	
 		main=new Main();
 		main.interfaz().setVisible(true);
+		server = new Servidor();
 		main.recibirSenal();
+		
 	}
-	
-	
+		
 	public void recibirSenal() throws IOException, ClassNotFoundException, InterruptedException {
 		entrada = null;
 		s = null;
@@ -77,23 +78,15 @@ public class Main extends JFrame implements ActionListener
 
                   	System.out.println("Main -> Tu eres el que tiene el mejor rank");
                   	
-                  	if(server == null) 
-                  	{
-                  		JOptionPane.showMessageDialog(null, "Tu eres el que tiene el mejor rank");
+                  	if(!server.seVeVentana()) {
                   		System.out.println("Main -> Iniciando servidor...");
-                        server = new Servidor();
-                    }
-                  	/*if(!server.interfazServidor().isVisible()) {
-                  		server.interfazServidor().setVisible(true);
-                  	}*/
-
-              
-                    } catch (IOException  e) {
+                  		JOptionPane.showMessageDialog(null, "Tu eres el que tiene el mejor rank");
+                      	server.verVentana(true);
+                  	}
+                  } catch (IOException  e) {
                         System.err.println("Error -> " + e.getMessage());
-                    }
+                  }
                 
-                    // le aviso a todos quien es el nuevo servidor
-                    //enviarDifusionIp(ip);
                     } 
         	}
         	
@@ -117,42 +110,7 @@ public class Main extends JFrame implements ActionListener
 		return this;
 	}
 	
-	/*
-	/* Este metodo envia a todos la nueva direccion 
-	private void enviarDifusionIp(String nuevaIpServidor) {
-		// enviar 5 veces la direccion (son 5 hosts)
-		for(int i=0; i<5; i++) {
-			try{
-				s2 = new Socket(direcciones[i],4060);
-				oos2 = new ObjectOutputStream(s2.getOutputStream());
-				oos2.writeObject(nuevaIpServidor);
-			}catch(Exception ex){
-				System.out.println(ex.getMessage());
-			}
-		}
-	}
-	*/
-	
-	/*
-	private void enviarSenal(String ip, int port) {
-		try{
-			System.out.println("Antes de cargar el socket");
-			//INSTANCIO EL SOCKET CON LA IP Y PUERTO
-			s=new Socket(ip,port);
-			System.out.println("socket cargado");
-			oos = new ObjectOutputStream(s.getOutputStream());
-			////ENVIO DE DATOS AL SERVIDOR
-			
-			oos.writeObject("eres el server");
-			
-			System.out.println("Cargado...");
-			System.out.println("Datos enviados");
-		}catch(Exception ex){
-			//ex.printStackTrace();
-			System.out.println(ex.getMessage());
-		}
-	}
-	*/
+
 	
 	//////
 	@Override
@@ -161,7 +119,6 @@ public class Main extends JFrame implements ActionListener
 		if(arg0.getSource()==btnEmpezar)
 		{
 			server=new Servidor();
-			server.interfazServidor().setVisible(true);
 			main.interfaz().setVisible(false);
 		}
 		
